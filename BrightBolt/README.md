@@ -1,16 +1,7 @@
 
 # Quiz Management System
 
-**QuizAppWithTimer** is an advanced MERN stack application designed for creating, managing, and taking quizzes. This system includes separate admin and user interfaces, offering a comprehensive experience for both creating quizzes and taking them. Features include quiz categorization, customizable time limits, and result tracking.
-
-### Team Name: ByteBuilders
-
-- **Team Members:**
-  - **Hailemeskel Getaneh** (GitHub: [Hailemeskel-Getaneh](https://github.com/Hailemeskel-Getaneh), Email: [hailegetaneh@gmail.com](mailto:hailegetaneh@gmail.com))
-  - **Mieraf Abebe** (GitHub: [MierafA12](https://github.com/MierafA12), Email: [mierafabebe12@gmail.com](mailto:mierafabebe12@gmail.com))
-  - **Lidia Shenkut** (GitHub: [lidia-shenkut](https://github.com/lidia-shenkut), Email: [liduruuha@gmail.com](mailto:liduruuha@gmail.com))
-
----
+**BrightBolt** is an advanced MERN stack application designed for creating, managing, and taking quizzes. This system includes separate admin and user interfaces, offering a comprehensive experience for both creating quizzes and taking them. Features include quiz categorization, customizable time limits, and result tracking.
 
 ## Features
 
@@ -63,12 +54,12 @@ Follow these steps to get the application up and running locally:
 
 ### 1. Clone the Repository:
 ```bash
-git clone https://github.com/Hailemeskel-Getaneh/quiz-app-with-timer.git
+git clone https://github.com/rahulrkg845418/BrightBolt.git
 ```
 
 ### 2. Navigate to the Project Directory:
 ```bash
-cd quiz-app-with-timer
+cd BrightBolt
 ```
 
 ### 3. Install Dependencies for Frontend and Backend:
@@ -110,7 +101,7 @@ This will start both the frontend (React) and backend (Node.js/Express) servers.
 ## Folder Structure
 
 ```plaintext
-quiz-app-with-timer
+BrightBolt
 ├── backend             # Backend (Node.js, Express, MongoDB)
 │   ├── controllers     # Logic to handle requests
 │   ├── models          # Database models (Mongoose)
@@ -132,44 +123,11 @@ quiz-app-with-timer
 
 ---
 
-## Contributing
-
-We welcome contributions to improve and extend the project. Please follow these steps to contribute:
-
-1. **Fork** the repository.
-2. **Clone** your fork:
-   ```bash
-   git clone https://github.com/your-username/quiz-app-with-timer.git
-   ```
-3. **Create a new branch** for your feature:
-   ```bash
-   git checkout -b feature-branch
-   ```
-4. **Make your changes** and commit them:
-   ```bash
-   git commit -m "Add new feature"
-   ```
-5. **Push** to your fork:
-   ```bash
-   git push origin feature-branch
-   ```
-6. **Open a pull request** with a detailed description of the changes.
-
----
-
 ## Authors
 
-- **Hailemeskel Getaneh**  
-  - GitHub: [Hailemeskel-Getaneh](https://github.com/Hailemeskel-Getaneh)  
-  - Email: [hailegetaneh@gmail.com](mailto:hailegetaneh@gmail.com)
-
-- **Mieraf Abebe**  
-  - GitHub: [MierafA12](https://github.com/MierafA12)  
-  - Email: [mierafabebe12@gmail.com](mailto:mierafabebe12@gmail.com)
-
-- **Lidia Shenkut**  
-  - GitHub: [lidia-shenkut](https://github.com/lidia-shenkut)  
-  - Email: [liduruuha@gmail.com](mailto:liduruuha@gmail.com)
+- **Rahul Gupta**  
+  
+  - Email: [rahulrkg845418@gmail.com](mailto:rahulrkg845418@gmail.com
 
 ---
 
