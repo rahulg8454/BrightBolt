@@ -1,9 +1,11 @@
 // axios-instance.jsx
 import axios from 'axios';
 
-const API = axios.create({
-  baseURL: "https://brightbolt-backend.onrender.com/api"
+const axiosInstance = axios.create({
+  baseURL: "https://brightbolt-backend.onrender.com",
+  withCredentials: true
 });
+
 
 
 instance.interceptors.request.use(
