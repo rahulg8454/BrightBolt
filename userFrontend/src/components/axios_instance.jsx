@@ -1,10 +1,10 @@
 // axios-instance.jsx
 import axios from 'axios';
 
-const instance = axios.create({
-  baseURL: 'http://localhost:4000/api',
-  timeout: 100000,
+const API = axios.create({
+  baseURL: "https://brightbolt-backend.onrender.com/api"
 });
+
 
 instance.interceptors.request.use(
   (config) => {
