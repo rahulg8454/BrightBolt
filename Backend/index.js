@@ -43,9 +43,11 @@ mongoose
     console.error('Database connection error:', err.message);
     process.exit(1); // Exit the application if the database connection fails
   });
-app.get("/", (req, res) => {
-  res.json({ message: "API is running" });
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
+
 
 // Routes
 app.use('/api', userRoutes); // Prefix user-related routes with `/api/users`
