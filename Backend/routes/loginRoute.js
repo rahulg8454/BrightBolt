@@ -27,7 +27,11 @@ router.post("/login", async (req, res) => {
         }
 
         // Respond with success if login is successful
-        res.status(200).json({ message: 'Login successful', user });
+        res.status(200).json({
+  message: 'Login successful!',
+  token: 'dummy-token'
+});
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error during login' });
