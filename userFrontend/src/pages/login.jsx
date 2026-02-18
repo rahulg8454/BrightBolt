@@ -18,7 +18,11 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       // Make the API call to the backend for login
-      const response = await axios.post('http://localhost:4000/api/users/login', loginData);
+const response = await axios.post(
+  'https://brightbolt-backend.onrender.com/api/users/login',
+  loginData
+);
+
 
       if (response.status === 200) {
         // Save the JWT token to localStorage
