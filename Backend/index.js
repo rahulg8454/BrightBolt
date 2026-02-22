@@ -26,7 +26,7 @@ app.use(
 
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000; 
+
 const MONGO_URL = process.env.MONGODB_URI;
 
 if (!MONGO_URL) {
@@ -43,10 +43,7 @@ mongoose
     console.error('Database connection error:', err.message);
     process.exit(1); // Exit the application if the database connection fails
   });
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
 
 
 // Routes
@@ -57,6 +54,8 @@ app.use('/api', quizRoutes);
 app.use('/api/user', sinupRoute);
 app.use('/api', dashboardRoutes)
 app.use('/api', quizResultRoutes)
+
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
