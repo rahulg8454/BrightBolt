@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axiosInstance from '../components/axios_instance';
 import '../styles/Dashborad.css';
 
 const Dashboard = () => {
@@ -15,9 +16,8 @@ const Dashboard = () => {
   // Fetching stats data from backend
   const fetchDashboardStats = async () => {
     try {
-      const response = await fetch("http://localhost:4000/api/dashboard-stats");
-      if (!response.ok) throw new Error("Failed to fetch dashboard stats");
-      const data = await response.json();
+      const response = await axiosInstance.get("/api/dashboard-stats");
+      const data = response.data;
       setStats({
         users: data.users || 0,
         quizzes: data.quizzes || 0,
