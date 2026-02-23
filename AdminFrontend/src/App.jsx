@@ -8,14 +8,14 @@ import AdminProfile from './pages/profile.jsx'
 import QuestionManagement from "./pages/QuestionManagement.jsx";
 import ParentManager from './components/ParentManager.jsx'; // Import ParentManager
 
-import Reports from "./pages/reports";
+import Reports from "./pages/Reports";
 import AdminHeader from "./components/adminHeader";
 import Sidebar from "./components/adminSidebar";
 
 import "./styles/adminStyles.css";
-import "./styles/adminStyles.css"; // Ensure the CSS file is imported
+
 import LoginPage from "./pages/adminLogin.jsx";
-import Signup from "./pages/signup.jsx";``
+import Signup from "./pages/signup.jsx";
 
 const App = () => {
  
