@@ -1,91 +1,235 @@
+/* Contact Page Wrapper */
+.contact-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
 .contact-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding:  100px;
-    font-family: Arial, sans-serif;
-    color: #1A2E49;
-    margin-top: 40px;
+  max-width: 700px;
+  width: 100%;
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  font-family: Arial, sans-serif;
+  color: #1A2E49;
+  margin-top: 20px;
+}
+
+.contact-title {
+  margin-bottom: 8px;
+  font-size: 28px;
+  color: #1A2E49;
+  text-align: center;
+}
+
+.contact-subtitle {
+  text-align: center;
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 30px;
+}
+
+/* Contact Info Box */
+.contact-info-box {
+  background: linear-gradient(135deg, #e8f0fe, #d4e8ff);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border-left: 4px solid #1976d2;
+}
+
+.contact-info-box h3 {
+  color: #1A2E49;
+  margin-bottom: 16px;
+  font-size: 1.2rem;
+}
+
+.contact-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.contact-info-item:last-child {
+  margin-bottom: 0;
+}
+
+.contact-info-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.contact-info-item strong {
+  display: block;
+  color: #1A2E49;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.contact-info-item p {
+  color: #555;
+  font-size: 0.9rem;
+  margin: 0 0 6px 0;
+}
+
+.admin-email-link {
+  color: #1976d2;
+  font-weight: bold;
+  font-size: 1rem;
+  text-decoration: none;
+  padding: 4px 12px;
+  background: rgba(25, 118, 210, 0.1);
+  border-radius: 6px;
+  border: 1px solid #1976d2;
+  display: inline-block;
+  transition: background 0.2s ease;
+}
+
+.admin-email-link:hover {
+  background: #1976d2;
+  color: #fff;
+}
+
+/* Help Topics */
+.help-topics {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid #e0e0e0;
+}
+
+.help-topics h3 {
+  color: #1A2E49;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+}
+
+.help-topics ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.help-topics ul li {
+  padding: 8px 0;
+  color: #444;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #eee;
+}
+
+.help-topics ul li:last-child {
+  border-bottom: none;
+}
+
+/* Contact Form */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contact-form h3 {
+  color: #1A2E49;
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+label {
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+  color: #1A2E49;
+  font-weight: 500;
+}
+
+input[type="text"],
+input[type="email"],
+textarea {
+  border: none;
+  border-bottom: 2px solid #dab4b0;
+  padding: 10px 5px;
+  font-size: 1rem;
+  background-color: transparent;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+textarea:focus {
+  border-bottom-color: rgb(56, 56, 232);
+}
+
+input.input-error,
+textarea.input-error {
+  border-bottom-color: #e74c3c;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.success {
+  color: #27ae60;
+  text-align: center;
+  margin-top: 10px;
+  font-weight: 500;
+  padding: 10px;
+  background: #eafaf1;
+  border-radius: 8px;
+  border: 1px solid #a9dfbf;
+}
+
+.submit-button {
+  padding: 12px 24px;
+  color: white;
+  background-color: rgb(56, 56, 232);
+  border: 2px solid rgb(56, 56, 232);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  align-self: flex-start;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: #ff5722;
+  border-color: #ff5722;
+  transform: scale(1.03);
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .contact-container {
+    padding: 24px 16px;
   }
-  #ccc{
-    color: #000;
-  }
-  h2 {
-    margin-bottom: 20px;
-    font-size: 26px;
-    color: #1A2E49;
-  }
-  
-  .contact-form {
-    display: flex;
+
+  .contact-info-item {
     flex-direction: column;
-    gap: 15px;
+    gap: 8px;
   }
-  
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-
-  }
-  
-  label {
-    font-size: 1rem;
-    margin-bottom: 5px;
-    color: #1A2E49;
-  }
-
-  
-  input[type="text"],
-  input[type="email"],
-  textarea {
-    border: none;
-    border-bottom: 2px solid #dab4b0 !important;
-    padding: 10px 5px;
-    font-size: 1rem;
-    background-color: transparent;
-    outline: none;
-    transition: border-color 0.3s ease;
-  }
-  
-  input[type="text"]:focus,
-  input[type="email"]:focus,
-  textarea:focus {
-    border-bottom-color: rgb(56, 56, 232);
-  }
-  
-  textarea {
-    resize: vertical;
-    height: 100px;
-  }
-  
-  .error {
-    color: #e74c3c;
-    font-size: 0.875rem;
-    position: absolute;
-    bottom: -20px;
-  }
-  
-  .success {
-    color: #1A2E49;
-    text-align: center;
-    margin-top: 20px;
-  }
-  
-  .submit-button {
-    padding: 10px 20px;
-    color:white;
-    background-color: rgb(56, 56, 232) ;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
-    border: rgb(56, 56, 232) 2px solid; 
-  }
-  
-  .submit-button:hover {
-    background-color: #ff5722;
-    transform: scale(1.05);
-  }
-  
-
-  
+}
