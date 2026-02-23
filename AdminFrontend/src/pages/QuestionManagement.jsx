@@ -4,12 +4,13 @@ import axiosInstance from '../components/axios_instance';
 import '../styles/QuestionManagement.css';
 
 const QuestionManagement = () => {
-  const [quizzes, setQuizzes] = useState([]); // For quizzes
+  const [quizzes, setQuizzes] = useState([]);
   const [selectedQuizId, setSelectedQuizId] = useState('');
   const [questions, setQuestions] = useState([]);
   const [questionText, setQuestionText] = useState('');
   const [options, setOptions] = useState(['', '', '', '']);
-  const [correctAnswer, setCorrectAnswer] = useState('');
+  // correctOptionIndex: 0-3 (index of correct option), null = not selected
+  const [correctOptionIndex, setCorrectOptionIndex] = useState(null);
   const [editingQuestion, setEditingQuestion] = useState(null);
 
   const fetchQuestions = async () => {
@@ -36,6 +37,16 @@ const QuestionManagement = () => {
       alert('Please select a quiz before adding a question.');
       return;
     }
+    if (correctOptionIndex === null) {
+      alert('Please select the correct option (Option 1, 2, 3, or 4).');
+      return;
+    }
+    // Store the text of the selected option as correctAnswer
+    const correctAnswer = options[correctOptionIndex];
+    if (!correctAnswer.trim()) {
+      alert(`Option ${correctOptionIndex + 1} is empty. Please fill it in before selecting it as correct.`);
+      return;
+    }
     const data = { quizId: selectedQuizId, questionText, options, correctAnswer };
     try {
       if (editingQuestion) {
@@ -56,7 +67,7 @@ const QuestionManagement = () => {
   const resetForm = () => {
     setQuestionText('');
     setOptions(['', '', '', '']);
-    setCorrectAnswer('');
+    setCorrectOptionIndex(null);
     setEditingQuestion(null);
   };
 
@@ -64,7 +75,9 @@ const QuestionManagement = () => {
     setEditingQuestion(question);
     setQuestionText(question.questionText);
     setOptions(question.options);
-    setCorrectAnswer(question.correctAnswer);
+    // Find index of correctAnswer in options
+    const idx = question.options.indexOf(question.correctAnswer);
+    setCorrectOptionIndex(idx >= 0 ? idx : null);
   };
 
   useEffect(() => {
@@ -79,18 +92,18 @@ const QuestionManagement = () => {
     <div className="question-management">
       <h2>Manage Questions</h2>
 
-      <div className="select-quiz">
+      {/* Select Quiz */}
+      <div className="form-section">
         <h3>Select Quiz</h3>
         <select
           value={selectedQuizId}
           onChange={(e) => setSelectedQuizId(e.target.value)}
+          className="quiz-select"
         >
           <option value="" disabled>-- Select a Quiz --</option>
           {quizzes.length > 0 ? (
             quizzes.map((quiz) => (
-              <option key={quiz._id} value={quiz._id} className="quizName">
-                {quiz.quizName}
-              </option>
+              <option key={quiz._id} value={quiz._id}>{quiz.quizName}</option>
             ))
           ) : (
             <option disabled>No quizzes available</option>
@@ -98,63 +111,107 @@ const QuestionManagement = () => {
         </select>
       </div>
 
-      <div className="add-question">
+      {/* Add / Edit Question Form */}
+      <div className="form-section">
         <h3>{editingQuestion ? 'Edit Question' : 'Add Question'}</h3>
+
         <input
           type="text"
           value={questionText}
           onChange={(e) => setQuestionText(e.target.value)}
           placeholder="Enter question text"
+          className="question-input"
         />
-        {options.map((option, index) => (
-          <input
-            key={index}
-            type="text"
-            value={option}
-            onChange={(e) => {
-              const newOptions = [...options];
-              newOptions[index] = e.target.value;
-              setOptions(newOptions);
-            }}
-            placeholder={`Option ${index + 1}`}
-          />
-        ))}
-        <input
-          type="text"
-          value={correctAnswer}
-          onChange={(e) => setCorrectAnswer(e.target.value)}
-          placeholder="Correct answer"
-        />
-        <button onClick={handleAddOrUpdateQuestion}>
-          {editingQuestion ? 'Update Question' : 'Add Question'}
-        </button>
-        {editingQuestion && <button onClick={resetForm}>Cancel</button>}
+
+        {/* Options with radio buttons */}
+        <div className="correct-answer-label">Select correct option:</div>
+        <div className="options-grid">
+          {options.map((option, index) => (
+            <div key={index} className={`option-row ${correctOptionIndex === index ? 'option-correct' : ''}`}>
+              <label className="option-radio-label">
+                <input
+                  type="radio"
+                  name="correctOption"
+                  value={index}
+                  checked={correctOptionIndex === index}
+                  onChange={() => setCorrectOptionIndex(index)}
+                  className="option-radio"
+                />
+                <span className="option-number">Option {index + 1}</span>
+              </label>
+              <input
+                type="text"
+                value={option}
+                onChange={(e) => {
+                  const newOptions = [...options];
+                  newOptions[index] = e.target.value;
+                  setOptions(newOptions);
+                }}
+                placeholder={`Enter option ${index + 1}`}
+                className="option-text-input"
+              />
+              {correctOptionIndex === index && (
+                <span className="correct-tick">&#10003; Correct</span>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="form-actions">
+          <button onClick={handleAddOrUpdateQuestion} className="btn-primary">
+            {editingQuestion ? 'Update Question' : 'Add Question'}
+          </button>
+          {editingQuestion && (
+            <button onClick={resetForm} className="btn-secondary">Cancel</button>
+          )}
+        </div>
       </div>
 
+      {/* Questions List */}
       {questions.length > 0 && (
-        <div className="question-list">
+        <div className="questions-list-section">
           <h3>Questions in this Quiz</h3>
-          <table>
+          <table className="questions-table">
             <thead>
               <tr>
+                <th>#</th>
                 <th>Question</th>
                 <th>Options</th>
-                <th>Action</th>
+                <th>Correct Answer</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {questions.map((question) => (
+              {questions.map((question, qIdx) => (
                 <tr key={question._id}>
-                  <td>{question.questionText}</td>
+                  <td>{qIdx + 1}</td>
+                  <td className="question-cell">{question.questionText}</td>
                   <td>
-                    {question.options.map((option, index) => (
-                      <p key={index}>{option}</p>
-                    ))}
+                    <ol className="options-list">
+                      {question.options.map((opt, i) => (
+                        <li
+                          key={i}
+                          className={opt === question.correctAnswer ? 'correct-option-item' : ''}
+                        >
+                          {opt}{opt === question.correctAnswer ? ' ✓' : ''}
+                        </li>
+                      ))}
+                    </ol>
                   </td>
-                  <td>
-                    <FaEdit onClick={() => handleEditQuestion(question)} />
+                  <td className="correct-answer-cell">
+                    {question.options.indexOf(question.correctAnswer) >= 0
+                      ? `Option ${question.options.indexOf(question.correctAnswer) + 1}`
+                      : question.correctAnswer}
+                  </td>
+                  <td className="actions-cell">
+                    <FaEdit
+                      className="icon-edit"
+                      onClick={() => handleEditQuestion(question)}
+                    />
                     <FaTrash
+                      className="icon-delete"
                       onClick={async () => {
+                        if (!window.confirm('Delete this question?')) return;
                         try {
                           await axiosInstance.delete(`/api/delete-question/${question._id}`);
                           alert('Question deleted successfully');
