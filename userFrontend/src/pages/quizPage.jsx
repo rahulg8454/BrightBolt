@@ -4,13 +4,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import '../styles/pagesStyle/quizPage.css';
 
 const UserPage = () => {
-  const [categories, setCategories] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [showPasscodeModal, setShowPasscodeModal] = useState(false);
   const [passcode, setPasscode] = useState('');
   const [message, setMessage] = useState('');
+  const [myResults, setMyResults] = useState([]);
+  const [loadingResults, setLoadingResults] = useState(true);
   const navigate = useNavigate();
 
   // Check if user is authenticated
@@ -27,6 +28,20 @@ const UserPage = () => {
     navigate('/login');
   };
 
+  // Get userId from token
+  const getUserId = () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return null;
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const payload = JSON.parse(atob(base64));
+      return payload.id || payload._id || payload.userId;
+    } catch (e) {
+      return null;
+    }
+  };
+
   // Fetch all quizzes on page load
   const fetchQuizzes = async () => {
     try {
@@ -34,6 +49,20 @@ const UserPage = () => {
       setQuizzes(response.data);
     } catch (error) {
       console.error('Error fetching quizzes:', error);
+    }
+  };
+
+  // Fetch user's attempted quiz results
+  const fetchMyResults = async () => {
+    try {
+      const userId = getUserId();
+      if (!userId) return;
+      const response = await axiosInstance.get(`/api/results/user/${userId}`);
+      setMyResults(response.data || []);
+    } catch (error) {
+      console.error('Error fetching results:', error);
+    } finally {
+      setLoadingResults(false);
     }
   };
 
@@ -51,6 +80,7 @@ const UserPage = () => {
             questions: response.data,
             quizName: selectedQuiz.quizName,
             totalTime: selectedQuiz.totalTime,
+            quizId: quizId,
           },
         });
       } else {
@@ -77,53 +107,106 @@ const UserPage = () => {
 
   useEffect(() => {
     fetchQuizzes();
+    fetchMyResults();
   }, []);
+
+  // Build a map of quizId -> best result for quick lookup
+  const resultMap = {};
+  myResults.forEach((r) => {
+    const qid = r.quizId?._id || r.quizId;
+    if (!resultMap[qid] || r.score > resultMap[qid].score) {
+      resultMap[qid] = r;
+    }
+  });
 
   return (
     <div className="quiz-page">
-      <h2>Quizzes</h2>
-
-      {quizzes.length > 0 ? (
-        quizzes.map((quiz) => (
-          <div
-            key={quiz._id}
-            className="quiz-card"
-            onClick={() => handleQuizClick(quiz)}
-          >
-            <h3>{quiz.quizName}</h3>
-            <p>Category: {quiz.categories.map((cat) => cat.name).join(', ')}</p>
-            <p>Time: {quiz.totalTime} minutes</p>
-            <button>Start</button>
-          </div>
-        ))
-      ) : (
-        <p>No quizzes available at the moment.</p>
-      )}
-
-      {showPasscodeModal && (
-        <div className="passcode-modal">
-          <h3>Enter Passcode for {selectedQuiz?.quizName}</h3>
-          <form onSubmit={handlePasscodeSubmit}>
-            <input
-              type="password"
-              value={passcode}
-              onChange={(e) => setPasscode(e.target.value)}
-              required
-              placeholder="Enter passcode"
-            />
-            <button type="submit">Submit</button>
-            <button type="button" onClick={() => setShowPasscodeModal(false)}>Cancel</button>
-          </form>
-          {message && <p>{message}</p>}
+      {/* Available Quizzes */}
+      <div className="quiz-section">
+        <h2 className="section-title">Available Quizzes</h2>
+        <div className="quiz-grid">
+          {quizzes.length > 0 ? (
+            quizzes.map((quiz) => {
+              const attempted = resultMap[quiz._id];
+              return (
+                <div key={quiz._id} className={`quiz-card-item ${attempted ? 'attempted' : ''}`}>
+                  <h3 className="quiz-name">{quiz.quizName}</h3>
+                  <p className="quiz-category">Category: {quiz.categories?.map((cat) => cat.name).join(', ') || 'General'}</p>
+                  <p className="quiz-time">Time: {quiz.totalTime} minutes</p>
+                  {attempted && (
+                    <div className="attempted-badge">
+                      <span>Attempted</span>
+                      <span className="attempted-score">
+                        Score: {attempted.correctAnswers}/{attempted.totalQuestions} ({((attempted.correctAnswers / Math.max(attempted.totalQuestions, 1)) * 100).toFixed(0)}%)
+                      </span>
+                    </div>
+                  )}
+                  <button className="start-btn" onClick={() => handleQuizClick(quiz)}>
+                    {attempted ? 'Retake' : 'Start'}
+                  </button>
+                </div>
+              );
+            })
+          ) : (
+            <p className="no-quiz">No quizzes available at the moment.</p>
+          )}
         </div>
-      )}
+      </div>
 
-      {questions.length > 0 && (
-        <div className="question-list">
-          <h3>Questions</h3>
-          {questions.map((question, index) => (
-            <p key={index}>{question.questionText}</p>
-          ))}
+      {/* My Attempted Quizzes */}
+      <div className="quiz-section results-section">
+        <h2 className="section-title">My Quiz History</h2>
+        {loadingResults ? (
+          <p className="loading-text">Loading your results...</p>
+        ) : myResults.length > 0 ? (
+          <div className="results-list">
+            {myResults.map((result, index) => {
+              const pct = ((result.correctAnswers / Math.max(result.totalQuestions, 1)) * 100).toFixed(0);
+              const passed = parseFloat(pct) >= 60;
+              return (
+                <div key={result._id || index} className="result-item">
+                  <div className="result-quiz-name">
+                    {result.quizId?.quizName || 'Quiz'}
+                  </div>
+                  <div className="result-stats">
+                    <span>Total: {result.totalQuestions}</span>
+                    <span className="correct">Correct: {result.correctAnswers}</span>
+                    <span className="wrong">Wrong: {result.wrongAnswers}</span>
+                    <span className={`score-badge ${passed ? 'pass' : 'fail'}`}>{pct}%</span>
+                  </div>
+                  <div className="result-date">
+                    {result.createdAt ? new Date(result.createdAt).toLocaleDateString('en-IN') : ''}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="no-results">You haven't attempted any quizzes yet.</p>
+        )}
+      </div>
+
+      {/* Passcode Modal */}
+      {showPasscodeModal && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h3>Enter Passcode for {selectedQuiz?.quizName}</h3>
+            <form onSubmit={handlePasscodeSubmit}>
+              <input
+                type="password"
+                value={passcode}
+                onChange={(e) => setPasscode(e.target.value)}
+                required
+                placeholder="Enter passcode"
+                className="passcode-input"
+              />
+              <div className="modal-btns">
+                <button type="submit" className="submit-btn">Submit</button>
+                <button type="button" className="cancel-btn" onClick={() => setShowPasscodeModal(false)}>Cancel</button>
+              </div>
+            </form>
+            {message && <p className="error-msg">{message}</p>}
+          </div>
         </div>
       )}
     </div>
