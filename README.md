@@ -1,148 +1,80 @@
-# BrightBolt - Quiz Management System
+# BrightBolt
 
-**BrightBolt** is a full-stack MERN application designed for creating, managing, and taking quizzes. It features separate Admin and User interfaces, role-based authentication, real-time timers, and result tracking.
+A quiz platform I built as a personal project to learn full-stack development. It has two separate frontends — one for users to take quizzes and one for admins to manage everything.
 
-## Author
+Built with the MERN stack (MongoDB, Express, React, Node.js).
 
-**Rahul Gupta**
-- GitHub: [rahulg8454](https://github.com/rahulg8454)
-- Email: rahul01.org@gmail.com
+## What it does
 
----
+**Admin side:**
+- Create and manage quizzes with passcodes and time limits
+- Add questions with 4 options and select which one is the correct answer
+- Add users and set individual passwords for each user
+- View quiz results and attempt stats on the dashboard
 
-## Features
+**User side:**
+- Login and browse available quizzes
+- Enter passcode to start a quiz, timer runs during the attempt
+- After submitting, see score with correct/wrong breakdown
+- Quiz history is saved so you can track past attempts
 
-### Admin Interface
-- **Quiz Management:** Create, update, and delete quizzes
-- **Question Management:** Add and manage quiz questions with categories
-- **Time Limit Settings:** Set custom time limits for each quiz
-- **User Management:** Add, edit, and delete users
-- **Analytics Dashboard:** View user progress and quiz results
+## Tech used
 
-### User Interface
-- **Quiz Participation:** Browse and take quizzes with passcode protection
-- **Real-time Timer:** Countdown timer for each quiz session
-- **Result Tracking:** View scores and leaderboard after quiz completion
-- **Authentication:** Secure login and registration
+- React (Vite)
+- Node.js + Express
+- MongoDB (Atlas)
+- JWT for auth
+- Deployed on Vercel
 
----
+## Running locally
 
-## Tech Stack
+You need 3 terminals open at the same time.
 
-- **Frontend:** React.js, Vite, CSS
-- **Backend:** Node.js, Express.js
-- **Database:** MongoDB
-- **Authentication:** JWT (JSON Web Tokens)
-
----
-
-## Local Development Setup
-
-### Prerequisites
-- Node.js (v16 or higher)
-- MongoDB (local or Atlas)
-- npm or yarn
-
-### 1. Clone the Repository
 ```bash
-git clone https://github.com/rahulg8454/BrightBolt.git
-cd BrightBolt
-```
-
-### 2. Backend Setup
-```bash
+# Terminal 1 - Backend
 cd Backend
 npm install
+npm run dev
+# runs on http://localhost:4000
+
+# Terminal 2 - User frontend
+cd userFrontend
+npm install
+npm run dev
+# runs on http://localhost:5173
+
+# Terminal 3 - Admin frontend
+cd AdminFrontend
+npm install
+npm run dev
+# runs on http://localhost:5174
 ```
 
-Create a `.env` file in the `Backend` folder (copy from `.env.example`):
-```env
-MONGODB_URI=mongodb://localhost:27017/brightbolt
+### Environment variables
+
+Copy `.env.example` to `.env` in each folder and fill in your values.
+
+**Backend `.env`:**
+```
+MONGODB_URI=your_mongodb_connection_string
 PORT=4000
-JWT_SECRET=your_jwt_secret_key_here
-NODE_ENV=development
-# Comma-separated list of allowed frontend URLs
+JWT_SECRET=anything_random_here
 CLIENT_URL=http://localhost:5173,http://localhost:5174
 ```
 
-Start the backend server:
-```bash
-npm run dev
+**userFrontend and AdminFrontend `.env`:**
 ```
-The backend runs on **http://localhost:4000**
-
-### 3. User Frontend Setup
-```bash
-cd userFrontend
-npm install
-```
-
-Create a `.env` file in the `userFrontend` folder (copy from `.env.example`):
-```env
 VITE_API_URL=http://localhost:4000
 ```
 
-Start the user frontend:
-```bash
-npm run dev
-```
-The user frontend runs on **http://localhost:5173**
+## Notes
 
-### 4. Admin Frontend Setup
-```bash
-cd AdminFrontend
-npm install
-```
+- Admin account is created directly in the database (no public signup for admin)
+- Users are created by the admin only — each user gets their own password
+- Contact/support page has admin email for any issues
 
-Create a `.env` file in the `AdminFrontend` folder (copy from `.env.example`):
-```env
-VITE_API_URL=http://localhost:4000
-```
+## Author
 
-Start the admin frontend:
-```bash
-npm run dev
-```
-The admin frontend runs on **http://localhost:5174**
-
----
-
-## Running All Services
-
-You need **3 terminal windows** running simultaneously:
-
-| Terminal | Directory | Command | URL |
-|----------|-----------|---------|-----|
-| 1 | `Backend` | `npm run dev` | http://localhost:4000 |
-| 2 | `userFrontend` | `npm run dev` | http://localhost:5173 |
-| 3 | `AdminFrontend` | `npm run dev` | http://localhost:5174 |
-
----
-
-## Project Structure
-
-```
-BrightBolt/
-├── Backend/                  # Express.js API server
-│   ├── controllers/          # Route handlers
-│   ├── models/               # MongoDB schemas
-│   ├── routes/               # API routes
-│   ├── index.js              # Entry point
-│   └── .env.example          # Environment variables template
-├── userFrontend/             # React user-facing app (port 5173)
-│   ├── src/
-│   │   ├── components/
-│   │   └── pages/
-│   └── .env.example
-└── AdminFrontend/            # React admin dashboard (port 5174)
-    ├── src/
-    │   ├── components/
-    │   └── pages/
-    └── .env.example
-```
-
----
-
-## License
-
-MIT License - Created by Rahul Gupta
+Rahul Gupta
+rahul01.org@gmail.com
+https://www.linkedin.com/in/rahul-gupta-077526277/
