@@ -1,10 +1,15 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
-import User from '../models/logModel.js';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import User from '../models/logModel.js'; // Admin login model (SignUp/logModel)
+
+dotenv.config();
 
 const router = express.Router();
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
 
-// Login Route
+// Admin Login Route
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -21,16 +26,22 @@ router.post("/login", async (req, res) => {
         }
 
         // Compare the provided password with the stored hashed password
-        const isPasswordMatch = await bcrypt.compare(password, user.password);
+        const isPasswordMatch = await user.comparePassword(password);
         if (!isPasswordMatch) {
             return res.status(400).json({ message: 'Invalid email or password.' });
         }
 
-        // Respond with success if login is successful
+        // Generate a real JWT token
+        const token = jwt.sign(
+            { id: user._id, email: user.email },
+            JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
         res.status(200).json({
-  message: 'Login successful!',
-  token: 'dummy-token'
-});
+            message: 'Login successful!',
+            token
+        });
 
     } catch (error) {
         console.error(error);
