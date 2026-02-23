@@ -66,6 +66,13 @@ const LoginPage = () => {
             </div>
             <button type="submit" className="login-btn">Login</button>
           </form>
+          <div className="register-section">
+            <p className="register-divider">New User?</p>
+            <div className="register-info">
+              <p>User ID and password are provided by the <strong>Admin</strong>.</p>
+              <p>Contact the administrator to get your credentials and access the quiz platform.</p>
+            </div>
+          </div>
         </div>
         <div className="vertical-line"></div>
         <div className="description">
