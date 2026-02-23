@@ -1,21 +1,25 @@
-import React, { useState } from "react";
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "../styles/adminHeader.css";
 
+const AdminHeader = () => {
+  const navigate = useNavigate();
 
-const AdminHeader = ({ toggleSidebar }) => {
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    navigate("/logging");
+  };
+
   return (
     <header className="admin-header">
       <div className="logo">
-      
         Quiz Admin
       </div>
       <nav className="nav-links">
-       
-         <a href="profile"   className="profile"> </a>
-        <a id="logout" href="LoginPage">Logout</a>
+        <Link to="/profile" className="profile">Profile</Link>
+        <button id="logout" onClick={handleLogout}>Logout</button>
       </nav>
     </header>
-    
   );
 };
 
