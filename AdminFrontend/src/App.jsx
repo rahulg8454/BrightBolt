@@ -12,7 +12,6 @@ import AdminHeader from "./components/adminHeader";
 import Sidebar from "./components/adminSidebar";
 import "./styles/adminStyles.css";
 import LoginPage from "./pages/adminLogin.jsx";
-import Signup from "./pages/signup.jsx";
 
 const AdminLayout = ({ children }) => (
   <div className="admin-app">
@@ -33,8 +32,6 @@ const App = () => {
         {/* Public routes - no header/sidebar */}
         <Route path="/" element={<Navigate to="/logging" replace />} />
         <Route path="/logging" element={<LoginPage />} />
-        <Route path="/Signup" element={<Signup />} />
-
         {/* Protected routes - with header and sidebar */}
         <Route path="/dashboard" element={<AdminLayout><Dashboard /></AdminLayout>} />
         <Route path="/quiz-management" element={<AdminLayout><QuizManagement /></AdminLayout>} />
@@ -44,7 +41,6 @@ const App = () => {
         <Route path="/profile" element={<AdminLayout><AdminProfile /></AdminLayout>} />
         <Route path="/reports" element={<AdminLayout><Reports /></AdminLayout>} />
         <Route path="/parent-manager" element={<AdminLayout><ParentManager /></AdminLayout>} />
-
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/logging" replace />} />
       </Routes>
