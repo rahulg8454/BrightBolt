@@ -1,33 +1,28 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
-import User from '../models/userModel.js'; // Ensure the User model is properly exported with ES6
-const router = express.Router();
+import User from '../models/userModel.js';
 import dotenv from 'dotenv';
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 
-dotenv.config()
-const secretKey = process.env.JWT_SECRET;
+dotenv.config();
+const router = express.Router();
+const secretKey = process.env.JWT_SECRET || 'default_secret_key';
 
-// Create a user
+// Create a user (used by Admin to add users)
 router.post('/add-user', async (req, res) => {
   const { userId, name, email, role } = req.body;
 
-
-  // Hash the default password
+  // Hash the default password before saving
   const defaultPassword = "qwe123";
-  // const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+  const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
-  // Generate unique ID for the user
-  // const userId = 'user' + Date.now();
-
-  
   const newUser = new User({
     userId,
     name,
     email,
-    password: defaultPassword,
+    password: hashedPassword,
     role,
-    score: 0, // Default score
+    score: 0,
   });
 
   try {
@@ -64,23 +59,19 @@ router.delete('/users/delete-user/:id', async (req, res) => {
   }
 });
 
-// Edit user by ID (newly added)
+// Edit user by ID
 router.put('/users/edit-user/:id', async (req, res) => {
   const userId = req.params.id;
-  const { name, email, role } = req.body; // Get updated details from the request body
-
+  const { name, email, role } = req.body;
   try {
-    // Find the user by ID and update their information
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { name, email, role }, // Update these fields
-      { new: true } // This ensures the updated document is returned
+      { name, email, role },
+      { new: true }
     );
-
     if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });
     }
-
     res.status(200).json({ message: 'User updated successfully', user: updatedUser });
   } catch (error) {
     console.error('Error updating user:', error);
@@ -88,28 +79,27 @@ router.put('/users/edit-user/:id', async (req, res) => {
   }
 });
 
-
-//check that the user is registered or not
-
+// User login - returns JWT token
 router.post('/users/login', async (req, res) => {
   const { userId, password } = req.body;
-
   try {
-    // Find user by email
+    // Find user by userId
     const user = await User.findOne({ userId });
-
-    // If user not found
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
     }
-
-
-    if (password != user.password) {
+    // Compare password using bcrypt
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid password.' });
     }
-
-    res.status(200).json({ message: 'Login successful!' });
-
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user._id, userId: user.userId, role: user.role },
+      secretKey,
+      { expiresIn: '1h' }
+    );
+    res.status(200).json({ message: 'Login successful!', token, userId: user.userId });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Internal server error.' });
@@ -117,13 +107,3 @@ router.post('/users/login', async (req, res) => {
 });
 
 export default router;
-
-
-
-
-
-
-
-
-
-
