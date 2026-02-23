@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { FaHome, FaClipboardList, FaQuestionCircle, FaUsers, FaThList, FaChartLine } from "react-icons/fa";  // Importing icons
+import { NavLink } from "react-router-dom";
+import { FaHome, FaClipboardList, FaQuestionCircle, FaUsers, FaThList, FaChartLine } from "react-icons/fa";
 import "../styles/sidebar.css";
 
 const Sidebar = () => {
@@ -8,30 +9,30 @@ const Sidebar = () => {
   return (
     <aside className={`sidebar ${isOpen ? "open" : "closed"}`}>
       <nav>
-        <a href="dashboard">
+        <NavLink to="/dashboard">
           <FaHome className="sidebar-icon" />
           <span className="sidebar-text">Dashboard</span>
-        </a>
-        <a href="quiz-management">
+        </NavLink>
+        <NavLink to="/quiz-management">
           <FaClipboardList className="sidebar-icon" />
           <span className="sidebar-text">Quizzes</span>
-        </a>
-        <a href="question-management">
+        </NavLink>
+        <NavLink to="/question-management">
           <FaQuestionCircle className="sidebar-icon" />
           <span className="sidebar-text">Questions</span>
-        </a>
-        <a href="user-management">
+        </NavLink>
+        <NavLink to="/user-management">
           <FaUsers className="sidebar-icon" />
           <span className="sidebar-text">Users</span>
-        </a>
-        <a href="catagory-management">
+        </NavLink>
+        <NavLink to="/category-management">
           <FaThList className="sidebar-icon" />
           <span className="sidebar-text">Categories</span>
-        </a>
-        <a href="reports">
+        </NavLink>
+        <NavLink to="/reports">
           <FaChartLine className="sidebar-icon" />
           <span className="sidebar-text">Reports</span>
-        </a>
+        </NavLink>
       </nav>
     </aside>
   );
