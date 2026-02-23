@@ -10,11 +10,15 @@ const secretKey = process.env.JWT_SECRET || 'default_secret_key';
 
 // Create a user (used by Admin to add users)
 router.post('/add-user', async (req, res) => {
-  const { userId, name, email, role } = req.body;
+  const { userId, name, email, password, role } = req.body;
 
-  // Hash the default password before saving
-  const defaultPassword = "qwe123";
-  const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+  // Validate that a password was provided
+  if (!password || password.trim().length < 4) {
+    return res.status(400).json({ message: 'Password must be at least 4 characters.' });
+  }
+
+  // Hash the admin-provided password before saving
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   const newUser = new User({
     userId,
@@ -59,14 +63,19 @@ router.delete('/users/delete-user/:id', async (req, res) => {
   }
 });
 
-// Edit user by ID
+// Edit user by ID (optionally reset password)
 router.put('/users/edit-user/:id', async (req, res) => {
   const userId = req.params.id;
-  const { name, email, role } = req.body;
+  const { name, email, role, password } = req.body;
   try {
+    const updateFields = { name, email, role };
+    // If admin provides a new password, hash and update it
+    if (password && password.trim().length >= 4) {
+      updateFields.password = await bcrypt.hash(password, 10);
+    }
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { name, email, role },
+      updateFields,
       { new: true }
     );
     if (!updatedUser) {
