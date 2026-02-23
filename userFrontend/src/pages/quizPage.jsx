@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../components/axios_instance';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/pagesStyle/quizPage.css';
 
@@ -17,7 +17,7 @@ const UserPage = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      navigate('/login'); // Redirect to login page if not authenticated
+      navigate('/login');
     }
   }, [navigate]);
 
@@ -30,7 +30,7 @@ const UserPage = () => {
   // Fetch all quizzes on page load
   const fetchQuizzes = async () => {
     try {
-      const response = await axios.get('http://localhost:4000/api/quizzes');
+      const response = await axiosInstance.get('/api/quizzes');
       setQuizzes(response.data);
     } catch (error) {
       console.error('Error fetching quizzes:', error);
@@ -40,13 +40,12 @@ const UserPage = () => {
   // Fetch questions and pass total time to QuizCard
   const fetchQuestions = async (quizId, enteredPasscode) => {
     try {
-      const response = await axios.post(`http://localhost:4000/api/quiz/${quizId}/questions`, {
+      const response = await axiosInstance.post(`/api/quiz/${quizId}/questions`, {
         passcode: enteredPasscode,
       });
       if (response.data && response.data.length > 0) {
         setQuestions(response.data);
         setMessage('');
-        // Redirect to QuizCard component with questions and total time
         navigate(`/quiz/${quizId}`, {
           state: {
             questions: response.data,
@@ -63,52 +62,48 @@ const UserPage = () => {
     }
   };
 
-  // Trigger when a user clicks on a quiz
   const handleQuizClick = (quiz) => {
     setSelectedQuiz(quiz);
     setShowPasscodeModal(true);
   };
 
-  // Handle passcode submission and fetch questions
   const handlePasscodeSubmit = (e) => {
     e.preventDefault();
     if (selectedQuiz) {
-      fetchQuestions(selectedQuiz._id, passcode); // Fetch questions and redirect to the quiz card
+      fetchQuestions(selectedQuiz._id, passcode);
       setShowPasscodeModal(false);
     }
   };
 
-  // Load quizzes on page load
   useEffect(() => {
     fetchQuizzes();
   }, []);
 
   return (
-    <div>
+    <div className="quiz-page">
       <h2>Quizzes</h2>
-      <div className="quizzes-container">
-        {quizzes.length > 0 ? (
-          quizzes.map((quiz) => (
-            <div
-              key={quiz._id}
-              className="quiz-card"
-              onClick={() => handleQuizClick(quiz)}
-            >
-              <h3>{quiz.quizName}</h3>
-              <p>Category: {quiz.categories.map((cat) => cat.name).join(', ')}</p>
-              <p>Time: {quiz.totalTime} minutes</p>
-              <button className="start-button">Start</button>
-            </div>
-          ))
-        ) : (
-          <p>No quizzes available at the moment.</p>
-        )}
-      </div>
+
+      {quizzes.length > 0 ? (
+        quizzes.map((quiz) => (
+          <div
+            key={quiz._id}
+            className="quiz-card"
+            onClick={() => handleQuizClick(quiz)}
+          >
+            <h3>{quiz.quizName}</h3>
+            <p>Category: {quiz.categories.map((cat) => cat.name).join(', ')}</p>
+            <p>Time: {quiz.totalTime} minutes</p>
+            <button>Start</button>
+          </div>
+        ))
+      ) : (
+        <p>No quizzes available at the moment.</p>
+      )}
 
       {showPasscodeModal && (
         <div className="passcode-modal">
+          <h3>Enter Passcode for {selectedQuiz?.quizName}</h3>
           <form onSubmit={handlePasscodeSubmit}>
-            <h3>Enter Passcode for {selectedQuiz?.quizName}</h3>
             <input
               type="password"
               value={passcode}
@@ -117,22 +112,17 @@ const UserPage = () => {
               placeholder="Enter passcode"
             />
             <button type="submit">Submit</button>
-            <Link to="/login">
-              <button type="button" className="cancel-button">Cancel</button>
-            </Link>
+            <button type="button" onClick={() => setShowPasscodeModal(false)}>Cancel</button>
           </form>
           {message && <p>{message}</p>}
         </div>
       )}
 
-      {/* Optionally, you can display questions here, but it's better to navigate to another page */}
       {questions.length > 0 && (
-        <div className="questions-container">
+        <div className="question-list">
           <h3>Questions</h3>
           {questions.map((question, index) => (
-            <div key={index} className="question-card">
-              <p>{question.questionText}</p>
-            </div>
+            <p key={index}>{question.questionText}</p>
           ))}
         </div>
       )}
