@@ -7,9 +7,11 @@ const AddUserModal = ({ setShowModal, fetchUsers }) => {
     userId: '',
     name: '',
     email: '',
+    password: '',
     role: 'user',
     score: 0
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,14 +20,20 @@ const AddUserModal = ({ setShowModal, fetchUsers }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!userData.password || userData.password.length < 4) {
+      alert('Password must be at least 4 characters.');
+      return;
+    }
     console.log('Submitting user data:', userData);
     try {
       const response = await axiosInstance.post('/api/add-user', userData);
       console.log('User added successfully:', response.data);
+      alert(`User created!\nUser ID: ${userData.userId}\nPassword: ${userData.password}`);
       fetchUsers();
       setShowModal(false);
     } catch (error) {
       console.error('Error during user submission:', error);
+      alert('Error creating user. Please try again.');
     }
   };
 
@@ -42,6 +50,7 @@ const AddUserModal = ({ setShowModal, fetchUsers }) => {
               name="userId"
               value={userData.userId}
               onChange={handleChange}
+              placeholder="e.g. john01"
               required
             />
           </div>
@@ -68,6 +77,27 @@ const AddUserModal = ({ setShowModal, fetchUsers }) => {
             />
           </div>
           <div className="input-group">
+            <label htmlFor="password">Password</label>
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                name="password"
+                value={userData.password}
+                onChange={handleChange}
+                placeholder="Set user password"
+                required
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
+          </div>
+          <div className="input-group">
             <label htmlFor="role">Role</label>
             <select
               id="role"
@@ -78,17 +108,6 @@ const AddUserModal = ({ setShowModal, fetchUsers }) => {
               <option value="user">User</option>
               <option value="admin">Admin</option>
             </select>
-          </div>
-          <div className="input-group">
-            <label htmlFor="score">Score</label>
-            <input
-              type="number"
-              id="score"
-              name="score"
-              value={userData.score}
-              onChange={handleChange}
-              required
-            />
           </div>
           <button type="submit">Add User</button>
           <button type="button" onClick={() => setShowModal(false)}>Close</button>
