@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Use navigate hook from react-router-dom
-import axios from 'axios'; // Import axios to send HTTP requests
+import { Link, useNavigate } from 'react-router-dom';
+import axiosInstance from '../components/axios_instance';
 import '../styles/signup.css';
 
 const SignupPage = () => {
@@ -9,35 +9,33 @@ const SignupPage = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
-    const navigate = useNavigate(); // To navigate after success
-  
-    // Function to handle form submission
+    const navigate = useNavigate();
+
     async function handleSignup(e) {
         e.preventDefault();
 
-        // Check if passwords match
         if (password !== confirmPassword) {
             setError("Passwords do not match");
-            setTimeout(() => setError(""), 4000); // Clear error message after 4 seconds
+            setTimeout(() => setError(""), 4000);
             return;
         }
 
         try {
-            const response = await axios.post("http://localhost:4000/api/register", {
+            const response = await axiosInstance.post("/api/register", {
                 email,
                 password
             });
             console.log(response.data);
             setSuccessMessage("Registration successful! Redirecting...");
             setTimeout(() => {
-                navigate("/logging"); // Redirect to Login page
+                navigate("/logging");
             }, 2000);
         } catch (err) {
             setError(err.response?.data?.message || "Something went wrong");
-            setTimeout(() => setError(""), 4000); // Clear error message after 4 seconds
+            setTimeout(() => setError(""), 4000);
         }
     }
-      
+
     return (
         <div className="form-container">
             <div className="form">
