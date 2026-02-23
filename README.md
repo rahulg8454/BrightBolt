@@ -44,77 +44,65 @@
 - npm or yarn
 
 ### 1. Clone the Repository
-
 ```bash
 git clone https://github.com/rahulg8454/BrightBolt.git
 cd BrightBolt
 ```
 
 ### 2. Backend Setup
-
 ```bash
 cd Backend
 npm install
 ```
 
 Create a `.env` file in the `Backend` folder (copy from `.env.example`):
-
 ```env
 MONGODB_URI=mongodb://localhost:27017/brightbolt
 PORT=4000
 JWT_SECRET=your_jwt_secret_key_here
 NODE_ENV=development
-CLIENT_URL=http://localhost:5173
+# Comma-separated list of allowed frontend URLs
+CLIENT_URL=http://localhost:5173,http://localhost:5174
 ```
 
 Start the backend server:
-
 ```bash
 npm run dev
 ```
-
 The backend runs on **http://localhost:4000**
 
 ### 3. User Frontend Setup
-
 ```bash
 cd userFrontend
 npm install
 ```
 
 Create a `.env` file in the `userFrontend` folder (copy from `.env.example`):
-
 ```env
 VITE_API_URL=http://localhost:4000
 ```
 
 Start the user frontend:
-
 ```bash
 npm run dev
 ```
-
 The user frontend runs on **http://localhost:5173**
 
 ### 4. Admin Frontend Setup
-
 ```bash
 cd AdminFrontend
 npm install
 ```
 
 Create a `.env` file in the `AdminFrontend` folder (copy from `.env.example`):
-
 ```env
 VITE_API_URL=http://localhost:4000
 ```
 
 Start the admin frontend:
-
 ```bash
 npm run dev
 ```
-
 The admin frontend runs on **http://localhost:5174**
 
 ---
@@ -135,18 +123,18 @@ You need **3 terminal windows** running simultaneously:
 
 ```
 BrightBolt/
-├── Backend/          # Express.js API server
-│   ├── controllers/  # Route handlers
-│   ├── models/       # MongoDB schemas
-│   ├── routes/       # API routes
-│   ├── index.js      # Entry point
-│   └── .env.example  # Environment variables template
-├── userFrontend/     # React user-facing app (port 5173)
+├── Backend/                  # Express.js API server
+│   ├── controllers/          # Route handlers
+│   ├── models/               # MongoDB schemas
+│   ├── routes/               # API routes
+│   ├── index.js              # Entry point
+│   └── .env.example          # Environment variables template
+├── userFrontend/             # React user-facing app (port 5173)
 │   ├── src/
 │   │   ├── components/
 │   │   └── pages/
 │   └── .env.example
-└── AdminFrontend/    # React admin dashboard (port 5174)
+└── AdminFrontend/            # React admin dashboard (port 5174)
     ├── src/
     │   ├── components/
     │   └── pages/
