@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axiosInstance from '../utils/axiosInstance';
+import axiosInstance from '../components/axios_instance';
 import '../styles/pagesStyle/contact.css';
 
 const ContactPage = () => {
