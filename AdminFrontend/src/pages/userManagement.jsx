@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/userManagement.css';
 import { FaSearch, FaEdit, FaTrash } from 'react-icons/fa';
+import axiosInstance from '../components/axios_instance';
 import AddUserModal from '../components/AddUserModal';
 import EditUserModal from '../components/EditUserModal';
 
@@ -9,17 +10,13 @@ const UserManagement = () => {
   const [search, setSearch] = useState('');
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null); // Store the user being edited
-  const [isAddingUser, setIsAddingUser] = useState(false); // Track whether we are adding a user
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isAddingUser, setIsAddingUser] = useState(false);
 
-  // Fetch all users from the backend
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/users');
-      if (!response.ok) throw new Error('Failed to fetch users');
-      const data = await response.json();
-      console.log("Fetched users:", data);
-      setUsers(data); // Save users to state
+      const response = await axiosInstance.get('/api/users');
+      setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -29,7 +26,6 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  // Filter users based on search input
   useEffect(() => {
     if (users.length > 0) {
       const result = users.filter(user =>
@@ -42,57 +38,40 @@ const UserManagement = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/users/delete-user/${id}`, { method: 'DELETE' });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Error deleting user:', errorData.message || 'Unknown error');
-        alert('Failed to delete user. Please try again.');
-        return;
-      }
-  
-      const data = await response.json(); // Handle the response data
-      setUsers(users.filter(user => user._id !== id)); // Remove deleted user from the UI
+      await axiosInstance.delete(`/api/users/delete-user/${id}`);
+      setUsers(users.filter(user => user._id !== id));
       alert('User deleted successfully');
     } catch (error) {
       console.error('Error deleting user:', error);
       alert('An error occurred while deleting the user. Please try again later.');
     }
-  };  
-
-  // Handle user editing
-  const handleEdit = (user) => {
-    setSelectedUser(user); // Set the selected user to be edited
-    setShowModal(true); // Show the modal
   };
 
-  // Toggle add user modal visibility
+  const handleEdit = (user) => {
+    setSelectedUser(user);
+    setShowModal(true);
+  };
+
   const handleAddUser = () => {
-    setIsAddingUser(true); // Set the flag to show Add User Modal
-    setShowModal(true); // Open the modal
+    setIsAddingUser(true);
+    setShowModal(true);
   };
 
   return (
-    <div className="user-management-container">
-      <div className="header">
-        <h2>User Management</h2>
-        <button className="add-user-btn" onClick={handleAddUser}>
-          + Add User
-        </button>
-      </div>
+    <div className="user-management">
+      <h2>User Management</h2>
+      <button onClick={handleAddUser}>+ Add User</button>
 
-      {/* Search Bar */}
       <div className="search-bar">
+        <FaSearch />
         <input
           type="text"
           placeholder="Search users..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)} // Update search state
+          onChange={(e) => setSearch(e.target.value)}
         />
-        <FaSearch />
       </div>
 
-      {/* User Table */}
       <table className="user-table">
         <thead>
           <tr>
@@ -110,40 +89,28 @@ const UserManagement = () => {
                 <td>{user.email}</td>
                 <td>{user.role}</td>
                 <td>
-                  <button onClick={() => handleEdit(user)} className="edit-btn">
-                    <FaEdit />
-                  </button>
-                  <button onClick={() => handleDelete(user._id)} className="delete-btn">
-                    <FaTrash />
-                  </button>
+                  <FaEdit onClick={() => handleEdit(user)} className="edit-btn" />
+                  <FaTrash onClick={() => handleDelete(user._id)} className="delete-btn" />
                 </td>
               </tr>
             ))
           ) : (
-            <tr>
-              <td colSpan="4">No users found</td>
-            </tr>
+            <tr><td colSpan="4">No users found</td></tr>
           )}
         </tbody>
       </table>
 
-      {/* Add User Modal */}
-      {showModal && (
-        <AddUserModal 
-          setShowModal={setShowModal} 
-          fetchUsers={fetchUsers} 
-          isAddingUser={isAddingUser} // Pass the flag for Add User
-          setIsAddingUser={setIsAddingUser} // Reset the flag after closing modal
+      {showModal && isAddingUser && (
+        <AddUserModal
+          setShowModal={setShowModal}
+          fetchUsers={fetchUsers}
         />
       )}
-      
-
-      {/* Edit User Modal */}
       {showModal && selectedUser && !isAddingUser && (
-        <EditUserModal 
-          user={selectedUser} 
-          setShowModal={setShowModal} 
-          fetchUsers={fetchUsers} 
+        <EditUserModal
+          user={selectedUser}
+          setShowModal={setShowModal}
+          fetchUsers={fetchUsers}
         />
       )}
     </div>
