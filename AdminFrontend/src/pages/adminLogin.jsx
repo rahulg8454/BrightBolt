@@ -37,7 +37,7 @@ const LoginPage = () => {
     return (
         <div className="form-container">
             <div className="form">
-                <h2>Login</h2>
+                <h2>Admin Login</h2>
                 <form onSubmit={handleLogin}>
                     <div className="form-group">
                         <label htmlFor="email">Email</label>
@@ -63,7 +63,6 @@ const LoginPage = () => {
                     {successMessage && <p className="success-message">{successMessage}</p>}
                     <button type="submit">Login</button>
                 </form>
-                <p>Don't have an account? <a href="/Signup">Sign Up</a></p>
             </div>
         </div>
     );
