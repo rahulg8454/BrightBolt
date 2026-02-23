@@ -1,6 +1,8 @@
 import express from "express";
-import User  from "../models/userModel.js"; // Your existing User model
-import Quiz  from "../models/quizModel.js"; // Your existing Quiz model
+import User from "../models/userModel.js";
+import Quiz from "../models/quizModel.js";
+import QuizResult from "../models/quizResultModel.js"; // Import QuizResult model
+
 const router = express.Router();
 
 router.get("/dashboard-stats", async (req, res) => {
@@ -11,24 +13,46 @@ router.get("/dashboard-stats", async (req, res) => {
     // Count total quizzes
     const totalQuizzes = await Quiz.countDocuments();
 
-    // Sum total attempts
-    const totalAttempts = await Quiz.aggregate([
-      { $group: { _id: null, totalAttempts: { $sum: "$attempts" } } },
+    // Count total attempts from QuizResult collection
+    const totalAttempts = await QuizResult.countDocuments();
+
+    // Calculate pass rate:
+    // A result is a "pass" if score >= 50% of totalQuestions
+    const passData = await QuizResult.aggregate([
+      {
+        $project: {
+          passed: {
+            $cond: {
+              if: {
+                $gte: [
+                  { $divide: ["$score", { $max: ["$totalQuestions", 1] }] },
+                  0.5
+                ]
+              },
+              then: 1,
+              else: 0
+            }
+          }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalPasses: { $sum: "$passed" },
+          totalAttempts: { $sum: 1 }
+        }
+      }
     ]);
 
-    // Calculate pass rate (this example assumes you have pass data in quizzes)
-    const passRateData = await Quiz.aggregate([
-      { $group: { _id: null, totalPasses: { $sum: "$passes" }, totalAttempts: { $sum: "$attempts" } } },
-    ]);
-    const passRate = passRateData.length
-      ? ((passRateData[0].totalPasses / passRateData[0].totalAttempts) * 100).toFixed(2)
-      : 0;
+    let passRate = 0;
+    if (passData.length > 0 && passData[0].totalAttempts > 0) {
+      passRate = ((passData[0].totalPasses / passData[0].totalAttempts) * 100).toFixed(2);
+    }
 
-    // Prepare the response
     res.json({
       users: totalUsers,
       quizzes: totalQuizzes,
-      attempts: totalAttempts.length ? totalAttempts[0].totalAttempts : 0,
+      attempts: totalAttempts,
       passRate,
     });
   } catch (error) {
@@ -36,6 +60,5 @@ router.get("/dashboard-stats", async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
-
 
 export default router;
