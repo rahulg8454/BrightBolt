@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import axios from 'axios'; // Import axios
-import '../styles/modal.css'; // Ensure to style this modal in a separate file
+import axiosInstance from './axios_instance';
+import '../styles/modal.css';
 
 const AddUserModal = ({ setShowModal, fetchUsers }) => {
   const [userData, setUserData] = useState({
-    userId: '', // Added userId field
+    userId: '',
     name: '',
     email: '',
     role: 'user',
-    score: 0 // Default score
+    score: 0
   });
 
   const handleChange = (e) => {
@@ -18,16 +18,12 @@ const AddUserModal = ({ setShowModal, fetchUsers }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log('Submitting user data:', userData); // Log the form data
-
+    console.log('Submitting user data:', userData);
     try {
-      const response = await axios.post('http://localhost:4000/api/add-user', userData);
-
+      const response = await axiosInstance.post('/api/add-user', userData);
       console.log('User added successfully:', response.data);
-
-      fetchUsers(); // Refresh the user list
-      setShowModal(false); // Close modal after submitting
+      fetchUsers();
+      setShowModal(false);
     } catch (error) {
       console.error('Error during user submission:', error);
     }
@@ -95,8 +91,8 @@ const AddUserModal = ({ setShowModal, fetchUsers }) => {
             />
           </div>
           <button type="submit">Add User</button>
+          <button type="button" onClick={() => setShowModal(false)}>Close</button>
         </form>
-        <button className="close-btn" onClick={() => setShowModal(false)}>Close</button>
       </div>
     </div>
   );
