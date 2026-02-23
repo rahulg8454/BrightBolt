@@ -45,7 +45,60 @@ router.post("/login", async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server error during login' });
+        res.status(500).json({ message: 'Server error. Please try again.' });
+    }
+});
+
+// Admin Change Password Route
+router.post("/admin/change-password", async (req, res) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+
+        // Get token from Authorization header
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ message: 'Unauthorized. Please login again.' });
+        }
+        const token = authHeader.split(' ')[1];
+
+        // Verify token
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ message: 'Invalid or expired token. Please login again.' });
+        }
+
+        // Validate inputs
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({ message: 'Old and new passwords are required.' });
+        }
+        if (newPassword.length < 6) {
+            return res.status(400).json({ message: 'New password must be at least 6 characters.' });
+        }
+
+        // Find admin by ID from token
+        const admin = await User.findById(decoded.id);
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found.' });
+        }
+
+        // Verify old password
+        const isMatch = await admin.comparePassword(oldPassword);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Current password is incorrect.' });
+        }
+
+        // Hash new password and save
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        admin.password = hashedPassword;
+        await admin.save();
+
+        res.status(200).json({ message: 'Password changed successfully.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error. Please try again.' });
     }
 });
 
