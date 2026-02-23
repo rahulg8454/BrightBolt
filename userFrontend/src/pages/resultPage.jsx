@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axiosInstance from '../components/axios_instance';
 import '../styles/pagesStyle/resultPage.css';
 
 const ResultPage = ({ userId }) => {
@@ -14,14 +15,12 @@ const ResultPage = ({ userId }) => {
         setLoading(true);
 
         // Fetch user result
-        const resultResponse = await fetch(`http://localhost:4000/api/result/${userId}`);
-        if (!resultResponse.ok) throw new Error('Failed to fetch user result');
-        const resultData = await resultResponse.json();
+        const resultResponse = await axiosInstance.get(`/api/result/${userId}`);
+        const resultData = resultResponse.data;
 
         // Fetch leaderboard
-        const leaderboardResponse = await fetch('http://localhost:4000/api/leaderboard');
-        if (!leaderboardResponse.ok) throw new Error('Failed to fetch leaderboard');
-        const leaderboardData = await leaderboardResponse.json();
+        const leaderboardResponse = await axiosInstance.get('/api/leaderboard');
+        const leaderboardData = leaderboardResponse.data;
 
         setResult(resultData);
         setLeaderboard(leaderboardData);
@@ -36,7 +35,7 @@ const ResultPage = ({ userId }) => {
   }, [userId]);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p className="error">Error: {error}</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="result-page">
@@ -53,32 +52,30 @@ const ResultPage = ({ userId }) => {
 
       <div className="leaderboard-section">
         <h3>Leaderboard</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Name</th>
-              <th>Score</th>
-              <th>Time Taken</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaderboard.length > 0 ? (
-              leaderboard.map((entry, index) => (
-                <tr key={entry.userId}>
+        {leaderboard.length > 0 ? (
+          <table>
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Score</th>
+                <th>Time Taken</th>
+              </tr>
+            </thead>
+            <tbody>
+              {leaderboard.map((entry, index) => (
+                <tr key={index}>
                   <td>{index + 1}</td>
                   <td>{entry.name}</td>
                   <td>{entry.score}</td>
                   <td>{entry.timeTaken} minutes</td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4">No leaderboard data available</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No leaderboard data available</p>
+        )}
       </div>
     </div>
   );
