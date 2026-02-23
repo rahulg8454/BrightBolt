@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "https://brightbolt-backend.onrender.com",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:4000",
 });
 
 // Attach token automatically if present
