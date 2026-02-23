@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Use navigate hook from react-router-dom
-import axios from 'axios'; // Import axios to send HTTP requests
+import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../components/axios_instance';
 import '../styles/adminLogin.css';
 
 const LoginPage = () => {
@@ -8,28 +8,32 @@ const LoginPage = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
-    const navigate = useNavigate(); // To navigate after success
-  
+    const navigate = useNavigate();
+
     // Function to handle form submission
     async function handleLogin(e) {
         e.preventDefault();
 
         try {
-            const response = await axios.post("http://localhost:4000/api/login", {
+            const response = await axiosInstance.post("/api/login", {
                 email,
                 password
             });
             console.log(response.data);
+            // Save the token to localStorage
+            if (response.data.token) {
+                localStorage.setItem('adminToken', response.data.token);
+            }
             setSuccessMessage("Login successful! Redirecting...");
             setTimeout(() => {
-                navigate("/dashboard"); // Redirect to Dashboard page
+                navigate("/dashboard");
             }, 2000);
         } catch (err) {
             setError(err.response?.data?.message || "Invalid credentials");
-            setTimeout(() => setError(""), 4000); // Clear error message after 4 seconds
+            setTimeout(() => setError(""), 4000);
         }
     }
-      
+
     return (
         <div className="form-container">
             <div className="form">
@@ -57,11 +61,9 @@ const LoginPage = () => {
                     </div>
                     {error && <p className="error-message">{error}</p>}
                     {successMessage && <p className="success-message">{successMessage}</p>}
-                    <button type="submit" className="form-btn">Login</button>
+                    <button type="submit">Login</button>
                 </form>
-                <div className="redirect-link">
-                    <p>Don't have an account? <Link to="/signup">Signup here</Link></p>
-                </div>
+                <p>Don't have an account? <a href="/Signup">Sign Up</a></p>
             </div>
         </div>
     );
