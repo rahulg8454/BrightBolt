@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/pagesStyle/login.css';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../components/axios_instance';
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({ userId: '', password: '' });
@@ -17,28 +17,11 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Make the API call to the backend for login
-const response = await axios.post(
-  'https://brightbolt-backend.onrender.com/api/users/login',
-  loginData
-);
-
-
+      const response = await axiosInstance.post('/api/users/login', loginData);
       if (response.status === 200) {
-        // Save the JWT token to localStorage
         localStorage.setItem('token', response.data.token);
-
-        // Debugging: Check if loginData.userId is being set correctly
-        console.log('User ID to be saved:', loginData.userId);
-        
-        // Save userId to localStorage
-        localStorage.setItem('userId', loginData.userId); // Save userId to localStorage
-
-        console.log('Token and userId saved to localStorage');
-        
+        localStorage.setItem('userId', loginData.userId);
         alert('Login successful!');
-        
-        // Redirect to the quiz page
         navigate('/quizPage');
       } else {
         alert('Login failed.');
@@ -93,7 +76,6 @@ const response = await axios.post(
           </p>
         </div>
       </div>
-
     </div>
   );
 };
