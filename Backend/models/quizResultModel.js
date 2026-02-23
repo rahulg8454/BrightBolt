@@ -8,8 +8,7 @@ const quizResultSchema = new mongoose.Schema({
   correctAnswers: { type: Number, default: 0 },
   wrongAnswers: { type: Number, default: 0 },
   answers: { type: Map, of: String },  // Store user's answers
-  timestamp: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 const QuizResult = mongoose.model('QuizResult', quizResultSchema);
 
