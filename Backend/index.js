@@ -15,17 +15,27 @@ const app = express();
 
 dotenv.config();
 
+// Allowed origins for CORS (supports both user and admin frontends)
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',')
+  : ['http://localhost:5173', 'http://localhost:5174'];
 
 // Middleware setup
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "*",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (e.g. mobile apps, curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   })
 );
 
 app.use(express.json());
-
 
 const MONGO_URL = process.env.MONGODB_URI;
 
@@ -44,8 +54,6 @@ mongoose
     process.exit(1); // Exit the application if the database connection fails
   });
 
-
-
 // Routes
 app.use('/api', userRoutes); // Prefix user-related routes with `/api/users`
 app.use('/api', categoryRoutes);
@@ -56,9 +64,6 @@ app.use('/api', dashboardRoutes)
 app.use('/api', quizResultRoutes)
 
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
-
-
