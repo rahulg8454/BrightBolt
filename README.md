@@ -60,10 +60,11 @@ npm install
 Create a `.env` file in the `Backend` folder (copy from `.env.example`):
 
 ```env
-MONGO_URI=mongodb://localhost:27017/brightbolt
+MONGODB_URI=mongodb://localhost:27017/brightbolt
 PORT=4000
 JWT_SECRET=your_jwt_secret_key_here
 NODE_ENV=development
+CLIENT_URL=http://localhost:5173
 ```
 
 Start the backend server:
