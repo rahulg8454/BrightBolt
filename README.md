@@ -1,194 +1,171 @@
+# BrightBolt - Quiz Management System
 
-# Quiz Management System
+**BrightBolt** is a full-stack MERN application designed for creating, managing, and taking quizzes. It features separate Admin and User interfaces, role-based authentication, real-time timers, and result tracking.
 
-**QuizAppWithTimer** is an advanced MERN stack application designed for creating, managing, and taking quizzes. This system includes separate admin and user interfaces, offering a comprehensive experience for both creating quizzes and taking them. Features include quiz categorization, customizable time limits, and result tracking.
+## Author
 
-### Team Name: ByteBuilders
-
-- **Team Members:**
-  - **Hailemeskel Getaneh** (GitHub: [Hailemeskel-Getaneh](https://github.com/Hailemeskel-Getaneh), Email: [hailegetaneh@gmail.com](mailto:hailegetaneh@gmail.com))
-  - **Mieraf Abebe** (GitHub: [MierafA12](https://github.com/MierafA12), Email: [mierafabebe12@gmail.com](mailto:mierafabebe12@gmail.com))
-  - **Lidia Shenkut** (GitHub: [lidia-shenkut](https://github.com/lidia-shenkut), Email: [liduruuha@gmail.com](mailto:liduruuha@gmail.com))
+**Rahul Gupta**
+- GitHub: [rahulg8454](https://github.com/rahulg8454)
+- Email: rahul01.org@gmail.com
 
 ---
 
 ## Features
 
-### Admin Interface:
-- **Quiz Management:** Create, update, and delete quizzes.
-- **Question Management:** Manage quiz questions with categories.
-- **Time Limit Settings:** Set time limits for each quiz.
-- **Quiz Distribution:** Assign and distribute quizzes to users.
-- **Analytics:** View and track user progress and results.
+### Admin Interface
+- **Quiz Management:** Create, update, and delete quizzes
+- **Question Management:** Add and manage quiz questions with categories
+- **Time Limit Settings:** Set custom time limits for each quiz
+- **User Management:** Add, edit, and delete users
+- **Analytics Dashboard:** View user progress and quiz results
 
-### User Interface:
-- **Assigned Quizzes:** Take quizzes assigned by the admin.
-- **Quiz Result Tracking:** View and track quiz results and performance.
-- **Timer:** Track remaining time while taking quizzes.
+### User Interface
+- **Take Quizzes:** Access quizzes assigned by the admin
+- **Real-time Timer:** Countdown timer while taking quizzes
+- **Result Tracking:** View scores and performance after each quiz
 
-### Authentication & Security:
-- **Role-based Authentication:** Admin and user roles with secure login and access control.
-- **JWT (JSON Web Tokens):** For authentication and token-based authorization.
-- **Password Security:** Passwords are securely hashed with **Bcrypt**.
-
-### User Experience:
-- **Responsive Design:** Works across multiple devices.
-- **Real-time Timer:** Countdown timer integrated with quizzes.
+### Authentication & Security
+- **Role-based Auth:** Separate Admin and User login flows
+- **JWT Tokens:** Secure token-based authorization
+- **Bcrypt:** Passwords hashed securely
 
 ---
 
-## Technologies Used
+## Tech Stack
 
-### Frontend:
-- **React.js** - For building user interfaces.
-- **Material-UI** - For designing the UI with modern components.
-- **Axios** - For making HTTP requests to the backend.
-- **React Router** - For navigation and routing.
+### Frontend
+- **React.js** + **Vite** - UI framework and build tool
+- **Material-UI** - Component library
+- **Axios** - HTTP requests
+- **React Router v7** - Client-side routing
 
-### Backend:
-- **Node.js** - JavaScript runtime for building the backend.
-- **Express.js** - Web framework for building RESTful APIs.
-- **MongoDB** - NoSQL database for storing quizzes and user data.
-- **Mongoose** - ODM for interacting with MongoDB.
-
-### Security & Utilities:
-- **JWT (JSON Web Tokens)** - For authentication and token-based authorization.
-- **Bcrypt.js** - For hashing passwords securely.
+### Backend
+- **Node.js** + **Express.js** - Server and REST API
+- **MongoDB** + **Mongoose** - Database and ODM
+- **JWT** - Authentication
+- **Bcrypt.js** - Password hashing
 
 ---
 
-## Installation
+## Project Structure
 
-Follow these steps to get the application up and running locally:
-
-### 1. Clone the Repository:
-```bash
-git clone https://github.com/Hailemeskel-Getaneh/quiz-app-with-timer.git
+```
+BrightBolt/
+├── Backend/              # Node.js + Express REST API
+│   ├── controllers/      # Route handler logic
+│   ├── models/           # Mongoose schemas
+│   ├── routes/           # API route definitions
+│   ├── index.js          # Server entry point
+│   └── .env              # Environment variables (not committed)
+├── AdminFrontend/        # React + Vite (Admin UI)
+│   └── src/
+│       ├── components/   # Reusable components
+│       ├── pages/        # Dashboard, Quiz, User management pages
+│       └── styles/       # CSS files
+├── userFrontend/         # React + Vite (User UI)
+│   └── src/
+│       ├── components/   # Reusable components
+│       ├── pages/        # Home, Login, Quiz, Result pages
+│       └── styles/       # CSS files
+└── README.md
 ```
 
-### 2. Navigate to the Project Directory:
+---
+
+## Local Setup
+
+### Prerequisites
+- Node.js v18+
+- MongoDB (local or Atlas)
+- npm
+
+### 1. Clone the Repository
+
 ```bash
-cd quiz-app-with-timer
+git clone https://github.com/rahulg8454/BrightBolt.git
+cd BrightBolt
 ```
 
-### 3. Install Dependencies for Frontend and Backend:
-- For the frontend:
-```bash
-cd frontend
-npm install
-```
-- For the backend:
-```bash
-cd ../backend
-npm install
-```
+### 2. Set Up Environment Variables
 
-### 4. Set Up Environment Variables:
-- Create a `.env` file inside the `backend` directory.
-- Add the following variables:
-
-```env
-MONGO_URI=your_mongodb_connection_string
+**Backend/.env** (create this file):
+```
+MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret_key
 PORT=4000
+CLIENT_URL=http://localhost:5173
 ```
 
-### 5. Start Development Servers:
-- To run both the backend and frontend concurrently:
+**userFrontend/.env** (create this file):
+```
+VITE_API_URL=http://localhost:4000
+```
+
+**AdminFrontend/.env** (create this file):
+```
+VITE_API_URL=http://localhost:4000
+```
+
+### 3. Install Dependencies
+
 ```bash
+# Backend
+cd Backend && npm install
+
+# User Frontend
+cd ../userFrontend && npm install
+
+# Admin Frontend
+cd ../AdminFrontend && npm install
+```
+
+### 4. Run Development Servers
+
+Open **3 terminals**:
+
+```bash
+# Terminal 1 - Backend (http://localhost:4000)
+cd Backend
+npm run dev
+
+# Terminal 2 - User Frontend (http://localhost:5173)
+cd userFrontend
+npm run dev
+
+# Terminal 3 - Admin Frontend (http://localhost:5174)
+cd AdminFrontend
 npm run dev
 ```
 
-This will start both the frontend (React) and backend (Node.js/Express) servers. The frontend will be accessible at `http://localhost:3000`.
+### 5. Access the App
 
-### 6. Access the Application:
-- **Admin Interface:** `http://localhost:3000/admin`
-- **User Interface:** `http://localhost:3000/user`
-
----
-
-## Folder Structure
-
-```plaintext
-quiz-app-with-timer
-├── backend             # Backend (Node.js, Express, MongoDB)
-│   ├── controllers     # Logic to handle requests
-│   ├── models          # Database models (Mongoose)
-│   ├── routes          # API routes for handling requests
-│   ├── utils           # Utility functions and middleware
-│   ├── .env            # Environment variables (hidden from public)
-│   ├── server.js       # Main entry point for the server
-│
-├── frontend            # Frontend (React.js)
-│   ├── components      # Reusable UI components (e.g., buttons, form fields)
-│   ├── pages           # Pages for Admin, User, etc.
-│   ├── services        # API calls using Axios
-│   ├── App.js          # Main app component
-│   ├── index.js        # Entry point for the React app
-│   ├── package.json    # Frontend dependencies and configurations
-│
-└── README.md           # Project documentation
-```
+| Service | URL |
+|---|---|
+| User App | http://localhost:5173 |
+| Admin App | http://localhost:5174 |
+| Backend API | http://localhost:4000 |
 
 ---
 
-## Contributing
+## API Endpoints
 
-We welcome contributions to improve and extend the project. Please follow these steps to contribute:
-
-1. **Fork** the repository.
-2. **Clone** your fork:
-   ```bash
-   git clone https://github.com/your-username/quiz-app-with-timer.git
-   ```
-3. **Create a new branch** for your feature:
-   ```bash
-   git checkout -b feature-branch
-   ```
-4. **Make your changes** and commit them:
-   ```bash
-   git commit -m "Add new feature"
-   ```
-5. **Push** to your fork:
-   ```bash
-   git push origin feature-branch
-   ```
-6. **Open a pull request** with a detailed description of the changes.
-
----
-
-## Authors
-
-- **Hailemeskel Getaneh**  
-  - GitHub: [Hailemeskel-Getaneh](https://github.com/Hailemeskel-Getaneh)  
-  - Email: [hailegetaneh@gmail.com](mailto:hailegetaneh@gmail.com)
-
-- **Mieraf Abebe**  
-  - GitHub: [MierafA12](https://github.com/MierafA12)  
-  - Email: [mierafabebe12@gmail.com](mailto:mierafabebe12@gmail.com)
-
-- **Lidia Shenkut**  
-  - GitHub: [lidia-shenkut](https://github.com/lidia-shenkut)  
-  - Email: [liduruuha@gmail.com](mailto:liduruuha@gmail.com)
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | /api/users/login | User login |
+| POST | /api/login | Admin login |
+| POST | /api/register | Admin signup |
+| GET | /api/quizzes | Get all quizzes |
+| POST | /api/create-quiz | Create a quiz |
+| GET | /api/categories | Get all categories |
+| GET | /api/users | Get all users |
+| GET | /api/dashboard-stats | Dashboard statistics |
 
 ---
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the MIT License.
 
 ---
 
-## Acknowledgments
-
-- **MERN Stack**: MongoDB, Express.js, React.js, Node.js
-- **Material-UI**: For creating a beautiful and responsive UI
-- **JWT & Bcrypt**: For secure authentication and password hashing
-- **GitHub**: For version control and collaboration
-
----
-
-Enjoy building and managing quizzes with the **Quiz Management System**!
-```
-
-----------------------------------------------
+Built with MERN Stack by **Rahul Gupta**
