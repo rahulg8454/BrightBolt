@@ -1,10 +1,13 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken'; // Importing jsonwebtoken to generate JWT
-import SignUp from '../models/logModel.js'; // Import the SignUp model
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import SignUp from '../models/logModel.js'; // User signup model
+
+dotenv.config();
 
 const router = express.Router();
-const JWT_SECRET = 'hailemeskelMierafLidia122116'; 
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
 
 // Sign up route
 router.post('/register', async (req, res) => {
@@ -22,7 +25,7 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ message: 'User already exists.' });
         }
 
-        // Create a new user
+        // Create a new user (password hashed by pre-save hook in logModel)
         const user = new SignUp({ email, password });
         await user.save();
 
@@ -56,9 +59,9 @@ router.post('/logging', async (req, res) => {
 
         // Generate a JWT
         const token = jwt.sign(
-            { id: user._id, email: user.email }, // Payload
-            JWT_SECRET, // Secret key
-            { expiresIn: '1h' } // Expiration time for the token
+            { id: user._id, email: user.email },
+            JWT_SECRET,
+            { expiresIn: '1h' }
         );
 
         return res.status(200).json({ token, message: 'Login successful!' });
