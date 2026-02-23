@@ -33,6 +33,8 @@ const UserManagement = () => {
         user.email.toLowerCase().includes(search.toLowerCase())
       );
       setFilteredUsers(result);
+    } else {
+      setFilteredUsers([]);
     }
   }, [search, users]);
 
@@ -49,19 +51,27 @@ const UserManagement = () => {
 
   const handleEdit = (user) => {
     setSelectedUser(user);
+    setIsAddingUser(false);
     setShowModal(true);
   };
 
   const handleAddUser = () => {
+    setSelectedUser(null);
     setIsAddingUser(true);
     setShowModal(true);
+  };
+
+  // Called by both modals when they close
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setIsAddingUser(false);
+    setSelectedUser(null);
   };
 
   return (
     <div className="user-management">
       <h2>User Management</h2>
       <button onClick={handleAddUser}>+ Add User</button>
-
       <div className="search-bar">
         <FaSearch />
         <input
@@ -71,7 +81,6 @@ const UserManagement = () => {
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
-
       <table className="user-table">
         <thead>
           <tr>
@@ -99,17 +108,16 @@ const UserManagement = () => {
           )}
         </tbody>
       </table>
-
       {showModal && isAddingUser && (
         <AddUserModal
-          setShowModal={setShowModal}
+          setShowModal={handleCloseModal}
           fetchUsers={fetchUsers}
         />
       )}
       {showModal && selectedUser && !isAddingUser && (
         <EditUserModal
           user={selectedUser}
-          setShowModal={setShowModal}
+          setShowModal={handleCloseModal}
           fetchUsers={fetchUsers}
         />
       )}
