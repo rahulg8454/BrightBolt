@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import axiosInstance from './axios_instance';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/pagesStyle/quizCard.css';
 import QuizTimer from './QuizTimer.jsx';
 
 const QuizCard = () => {
   const { state } = useLocation();
+  const navigate = useNavigate();
   const { questions, quizName, quizId, totalTime } = state || {};
 
   // Check if timer was saved in localStorage and restore it
@@ -15,14 +16,15 @@ const QuizCard = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [answers, setAnswers] = useState({});
   const [quizCompleted, setQuizCompleted] = useState(false);
-  const [quizDuration, setQuizDuration] = useState(initialTime); // Start with the saved or default time
+  const [quizDuration, setQuizDuration] = useState(initialTime);
+  const [quizResult, setQuizResult] = useState(null); // stores { score, totalQuestions, correctAnswers, wrongAnswers }
+  const [submitError, setSubmitError] = useState('');
 
   const QUESTIONS_PER_PAGE = 2;
 
-  // Timer logic to update and handle quiz duration
+  // Timer logic
   useEffect(() => {
     if (quizCompleted) return;
-
     const interval = setInterval(() => {
       setQuizDuration((prevDuration) => {
         if (prevDuration <= 1) {
@@ -30,14 +32,12 @@ const QuizCard = () => {
           handleTimeUp();
           return 0;
         }
-
         const newDuration = prevDuration - 1;
-        localStorage.setItem(`quizTime-${quizId}`, newDuration); // Save remaining time
+        localStorage.setItem(`quizTime-${quizId}`, newDuration);
         return newDuration;
       });
     }, 1000);
-
-    return () => clearInterval(interval); // Clean up on component unmount
+    return () => clearInterval(interval);
   }, [quizCompleted, quizId]);
 
   const handleTimeUp = () => {
@@ -67,17 +67,41 @@ const QuizCard = () => {
 
   const handleSubmit = async () => {
     setQuizCompleted(true);
+    setSubmitError('');
     try {
-      const score = calculateScore(); // Calculate the score
-      await axios.post(`http://localhost:4000/api/quizzes/${quizId}/submit`, {
+      // Get userId from token stored in localStorage
+      const token = localStorage.getItem('token');
+      let userId = null;
+      if (token) {
+        try {
+          const base64Url = token.split('.')[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const payload = JSON.parse(atob(base64));
+          userId = payload.id || payload._id || payload.userId;
+        } catch (e) {
+          console.error('Token decode error:', e);
+        }
+      }
+
+      const response = await axiosInstance.post(`/api/quizzes/${quizId}/submit`, {
+        userId,
         answers,
-        score,
       });
 
-      alert('Quiz submitted successfully!');
-      localStorage.removeItem(`quizTime-${quizId}`); // Clear stored timer
+      const { score, totalQuestions, correctAnswers, wrongAnswers } = response.data;
+      setQuizResult({ score, totalQuestions, correctAnswers, wrongAnswers });
+      localStorage.removeItem(`quizTime-${quizId}`);
     } catch (error) {
       console.error('Error submitting quiz:', error);
+      setSubmitError('Could not save result. Please try again.');
+      // Still show local calculation
+      const localScore = calculateScore();
+      setQuizResult({
+        score: localScore,
+        totalQuestions: questions.length,
+        correctAnswers: localScore,
+        wrongAnswers: questions.length - localScore,
+      });
     }
   };
 
@@ -96,52 +120,74 @@ const QuizCard = () => {
     (currentPage + 1) * QUESTIONS_PER_PAGE
   );
 
+  const totalAnswered = Object.keys(answers).length;
+  const percentage = quizResult
+    ? ((quizResult.correctAnswers / Math.max(quizResult.totalQuestions, 1)) * 100).toFixed(1)
+    : 0;
+
   return (
-    <div className="quiz-container">
-      <div className="quiz-header">
-        <h2>{quizName}</h2>
-        <QuizTimer duration={quizDuration} onTimeUp={handleTimeUp} />
-      </div>
+    <div className="quiz-card-container">
+      <h2 className="quiz-title">{quizName}</h2>
 
       {quizCompleted ? (
-        <div className="quiz-completed-message">
-          <h3>Thank you for completing the quiz!</h3>
-          <p>
-            You answered {Object.keys(answers).length} out of {questions.length}{' '}
-            questions.
-          </p>
-          <p>
-            Your score: {calculateScore()} out of {questions.length}.
-          </p>
+        <div className="quiz-result-summary">
+          <h3>Quiz Completed!</h3>
+          {quizResult ? (
+            <>
+              <div className="result-stats">
+                <div className="stat-box total">
+                  <span className="stat-label">Total Questions</span>
+                  <span className="stat-value">{quizResult.totalQuestions}</span>
+                </div>
+                <div className="stat-box correct">
+                  <span className="stat-label">Correct</span>
+                  <span className="stat-value">{quizResult.correctAnswers}</span>
+                </div>
+                <div className="stat-box wrong">
+                  <span className="stat-label">Wrong</span>
+                  <span className="stat-value">{quizResult.wrongAnswers}</span>
+                </div>
+                <div className="stat-box score">
+                  <span className="stat-label">Score</span>
+                  <span className="stat-value">{percentage}%</span>
+                </div>
+              </div>
+              <p className="result-message">
+                {parseFloat(percentage) >= 50
+                  ? 'Congratulations! You passed the quiz.'
+                  : 'Keep practising! You can do better next time.'}
+              </p>
+            </>
+          ) : (
+            <p>Saving your result...</p>
+          )}
+          {submitError && <p className="submit-error">{submitError}</p>}
+          <button className="back-btn" onClick={() => navigate('/quizPage')}>Back to Quizzes</button>
         </div>
       ) : (
         <>
+          <div className="quiz-meta">
+            <span>Questions answered: {totalAnswered} / {questions?.length || 0}</span>
+            <QuizTimer duration={quizDuration} />
+          </div>
           {currentQuestions && currentQuestions.length > 0 ? (
-            <div className="quiz-question-card">
+            <div className="questions-section">
               {currentQuestions.map((question, index) => {
                 const questionIndex = currentPage * QUESTIONS_PER_PAGE + index;
                 return (
-                  <div key={questionIndex} className="quiz-question">
-                    <p className="quiz-question-text">
-                      <strong>Question {questionIndex + 1}:</strong>{' '}
-                      {question.questionText}
+                  <div key={questionIndex} className="question-block">
+                    <p className="question-text">
+                      <strong>Question {questionIndex + 1}:</strong> {question.questionText}
                     </p>
-                    <div className="quiz-options">
+                    <div className="options-list">
                       {question.options.map((option, optionIndex) => (
-                        <label
-                          key={optionIndex}
-                          className={`quiz-option ${
-                            answers[questionIndex] === option ? 'selected' : ''
-                          }`}
-                        >
+                        <label key={optionIndex} className="option-label">
                           <input
                             type="radio"
                             name={`question-${questionIndex}`}
                             value={option}
                             checked={answers[questionIndex] === option}
-                            onChange={() =>
-                              handleOptionChange(questionIndex, option)
-                            }
+                            onChange={() => handleOptionChange(questionIndex, option)}
                           />
                           {option}
                         </label>
@@ -150,28 +196,18 @@ const QuizCard = () => {
                   </div>
                 );
               })}
-              <div className="quiz-navigation">
-                <button
-                  className="quiz-button"
-                  onClick={handlePrevious}
-                  disabled={currentPage === 0}
-                >
-                  Previous
-                </button>
-                {(currentPage + 1) * QUESTIONS_PER_PAGE < questions.length ? (
-                  <button className="quiz-button" onClick={handleNext}>
-                    Next
-                  </button>
-                ) : (
-                  <button className="quiz-button" onClick={handleSubmit}>
-                    Submit
-                  </button>
-                )}
-              </div>
             </div>
           ) : (
             <p>No questions available.</p>
           )}
+          <div className="quiz-nav">
+            <button onClick={handlePrevious} disabled={currentPage === 0}>Previous</button>
+            {(currentPage + 1) * QUESTIONS_PER_PAGE < questions.length ? (
+              <button onClick={handleNext}>Next</button>
+            ) : (
+              <button onClick={handleSubmit} className="submit-btn">Submit Quiz</button>
+            )}
+          </div>
         </>
       )}
     </div>
