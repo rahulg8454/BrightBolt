@@ -20,64 +20,28 @@
 - **Analytics Dashboard:** View user progress and quiz results
 
 ### User Interface
-- **Take Quizzes:** Access quizzes assigned by the admin
-- **Real-time Timer:** Countdown timer while taking quizzes
-- **Result Tracking:** View scores and performance after each quiz
-
-### Authentication & Security
-- **Role-based Auth:** Separate Admin and User login flows
-- **JWT Tokens:** Secure token-based authorization
-- **Bcrypt:** Passwords hashed securely
+- **Quiz Participation:** Browse and take quizzes with passcode protection
+- **Real-time Timer:** Countdown timer for each quiz session
+- **Result Tracking:** View scores and leaderboard after quiz completion
+- **Authentication:** Secure login and registration
 
 ---
 
 ## Tech Stack
 
-### Frontend
-- **React.js** + **Vite** - UI framework and build tool
-- **Material-UI** - Component library
-- **Axios** - HTTP requests
-- **React Router v7** - Client-side routing
-
-### Backend
-- **Node.js** + **Express.js** - Server and REST API
-- **MongoDB** + **Mongoose** - Database and ODM
-- **JWT** - Authentication
-- **Bcrypt.js** - Password hashing
+- **Frontend:** React.js, Vite, CSS
+- **Backend:** Node.js, Express.js
+- **Database:** MongoDB
+- **Authentication:** JWT (JSON Web Tokens)
 
 ---
 
-## Project Structure
-
-```
-BrightBolt/
-├── Backend/              # Node.js + Express REST API
-│   ├── controllers/      # Route handler logic
-│   ├── models/           # Mongoose schemas
-│   ├── routes/           # API route definitions
-│   ├── index.js          # Server entry point
-│   └── .env              # Environment variables (not committed)
-├── AdminFrontend/        # React + Vite (Admin UI)
-│   └── src/
-│       ├── components/   # Reusable components
-│       ├── pages/        # Dashboard, Quiz, User management pages
-│       └── styles/       # CSS files
-├── userFrontend/         # React + Vite (User UI)
-│   └── src/
-│       ├── components/   # Reusable components
-│       ├── pages/        # Home, Login, Quiz, Result pages
-│       └── styles/       # CSS files
-└── README.md
-```
-
----
-
-## Local Setup
+## Local Development Setup
 
 ### Prerequisites
-- Node.js v18+
+- Node.js (v16 or higher)
 - MongoDB (local or Atlas)
-- npm
+- npm or yarn
 
 ### 1. Clone the Repository
 
@@ -86,86 +50,110 @@ git clone https://github.com/rahulg8454/BrightBolt.git
 cd BrightBolt
 ```
 
-### 2. Set Up Environment Variables
-
-**Backend/.env** (create this file):
-```
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
-PORT=4000
-CLIENT_URL=http://localhost:5173
-```
-
-**userFrontend/.env** (create this file):
-```
-VITE_API_URL=http://localhost:4000
-```
-
-**AdminFrontend/.env** (create this file):
-```
-VITE_API_URL=http://localhost:4000
-```
-
-### 3. Install Dependencies
+### 2. Backend Setup
 
 ```bash
-# Backend
-cd Backend && npm install
-
-# User Frontend
-cd ../userFrontend && npm install
-
-# Admin Frontend
-cd ../AdminFrontend && npm install
-```
-
-### 4. Run Development Servers
-
-Open **3 terminals**:
-
-```bash
-# Terminal 1 - Backend (http://localhost:4000)
 cd Backend
-npm run dev
+npm install
+```
 
-# Terminal 2 - User Frontend (http://localhost:5173)
-cd userFrontend
-npm run dev
+Create a `.env` file in the `Backend` folder (copy from `.env.example`):
 
-# Terminal 3 - Admin Frontend (http://localhost:5174)
-cd AdminFrontend
+```env
+MONGO_URI=mongodb://localhost:27017/brightbolt
+PORT=4000
+JWT_SECRET=your_jwt_secret_key_here
+NODE_ENV=development
+```
+
+Start the backend server:
+
+```bash
 npm run dev
 ```
 
-### 5. Access the App
+The backend runs on **http://localhost:4000**
 
-| Service | URL |
-|---|---|
-| User App | http://localhost:5173 |
-| Admin App | http://localhost:5174 |
-| Backend API | http://localhost:4000 |
+### 3. User Frontend Setup
+
+```bash
+cd userFrontend
+npm install
+```
+
+Create a `.env` file in the `userFrontend` folder (copy from `.env.example`):
+
+```env
+VITE_API_URL=http://localhost:4000
+```
+
+Start the user frontend:
+
+```bash
+npm run dev
+```
+
+The user frontend runs on **http://localhost:5173**
+
+### 4. Admin Frontend Setup
+
+```bash
+cd AdminFrontend
+npm install
+```
+
+Create a `.env` file in the `AdminFrontend` folder (copy from `.env.example`):
+
+```env
+VITE_API_URL=http://localhost:4000
+```
+
+Start the admin frontend:
+
+```bash
+npm run dev
+```
+
+The admin frontend runs on **http://localhost:5174**
 
 ---
 
-## API Endpoints
+## Running All Services
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | /api/users/login | User login |
-| POST | /api/login | Admin login |
-| POST | /api/register | Admin signup |
-| GET | /api/quizzes | Get all quizzes |
-| POST | /api/create-quiz | Create a quiz |
-| GET | /api/categories | Get all categories |
-| GET | /api/users | Get all users |
-| GET | /api/dashboard-stats | Dashboard statistics |
+You need **3 terminal windows** running simultaneously:
+
+| Terminal | Directory | Command | URL |
+|----------|-----------|---------|-----|
+| 1 | `Backend` | `npm run dev` | http://localhost:4000 |
+| 2 | `userFrontend` | `npm run dev` | http://localhost:5173 |
+| 3 | `AdminFrontend` | `npm run dev` | http://localhost:5174 |
+
+---
+
+## Project Structure
+
+```
+BrightBolt/
+├── Backend/          # Express.js API server
+│   ├── controllers/  # Route handlers
+│   ├── models/       # MongoDB schemas
+│   ├── routes/       # API routes
+│   ├── index.js      # Entry point
+│   └── .env.example  # Environment variables template
+├── userFrontend/     # React user-facing app (port 5173)
+│   ├── src/
+│   │   ├── components/
+│   │   └── pages/
+│   └── .env.example
+└── AdminFrontend/    # React admin dashboard (port 5174)
+    ├── src/
+    │   ├── components/
+    │   └── pages/
+    └── .env.example
+```
 
 ---
 
 ## License
 
-This project is licensed under the MIT License.
-
----
-
-Built with MERN Stack by **Rahul Gupta**
+MIT License - Created by Rahul Gupta
