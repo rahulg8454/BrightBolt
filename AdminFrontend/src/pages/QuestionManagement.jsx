@@ -9,7 +9,7 @@ const QuestionManagement = () => {
   const [questions, setQuestions] = useState([]);
   const [questionText, setQuestionText] = useState('');
   const [options, setOptions] = useState(['', '', '', '']);
-  // correctOptionIndex: 0-3 (index of correct option), null = not selected
+  // correctOptionIndex: 0-3 (index of the correct option selected by admin)
   const [correctOptionIndex, setCorrectOptionIndex] = useState(null);
   const [editingQuestion, setEditingQuestion] = useState(null);
 
@@ -71,12 +71,15 @@ const QuestionManagement = () => {
     setEditingQuestion(null);
   };
 
+  // When editing, find which option index matches the stored correctAnswer
   const handleEditQuestion = (question) => {
     setEditingQuestion(question);
     setQuestionText(question.questionText);
     setOptions(question.options);
-    // Find index of correctAnswer in options
-    const idx = question.options.indexOf(question.correctAnswer);
+    // Find the index of the correct answer in the options array
+    const idx = question.options.findIndex(
+      (opt) => opt === question.correctAnswer
+    );
     setCorrectOptionIndex(idx >= 0 ? idx : null);
   };
 
@@ -93,17 +96,18 @@ const QuestionManagement = () => {
       <h2>Manage Questions</h2>
 
       {/* Select Quiz */}
-      <div className="form-section">
+      <div className="select-quiz">
         <h3>Select Quiz</h3>
         <select
           value={selectedQuizId}
           onChange={(e) => setSelectedQuizId(e.target.value)}
-          className="quiz-select"
         >
           <option value="" disabled>-- Select a Quiz --</option>
           {quizzes.length > 0 ? (
             quizzes.map((quiz) => (
-              <option key={quiz._id} value={quiz._id}>{quiz.quizName}</option>
+              <option key={quiz._id} value={quiz._id} className="quizName">
+                {quiz.quizName}
+              </option>
             ))
           ) : (
             <option disabled>No quizzes available</option>
@@ -111,8 +115,8 @@ const QuestionManagement = () => {
         </select>
       </div>
 
-      {/* Add / Edit Question Form */}
-      <div className="form-section">
+      {/* Add/Edit Question Form */}
+      <div className="add-question">
         <h3>{editingQuestion ? 'Edit Question' : 'Add Question'}</h3>
 
         <input
@@ -120,111 +124,113 @@ const QuestionManagement = () => {
           value={questionText}
           onChange={(e) => setQuestionText(e.target.value)}
           placeholder="Enter question text"
-          className="question-input"
         />
 
-        {/* Options with radio buttons */}
-        <div className="correct-answer-label">Select correct option:</div>
-        <div className="options-grid">
-          {options.map((option, index) => (
-            <div key={index} className={`option-row ${correctOptionIndex === index ? 'option-correct' : ''}`}>
-              <label className="option-radio-label">
+        {options.map((option, index) => (
+          <input
+            key={index}
+            type="text"
+            value={option}
+            onChange={(e) => {
+              const newOptions = [...options];
+              newOptions[index] = e.target.value;
+              setOptions(newOptions);
+            }}
+            placeholder={`Option ${index + 1}`}
+          />
+        ))}
+
+        {/* Correct Option Radio Selector */}
+        <div className="correct-option-selector">
+          <p className="correct-option-label">Select Correct Option:</p>
+          <div className="correct-option-radios">
+            {options.map((option, index) => (
+              <label key={index} className={`correct-option-radio-label${correctOptionIndex === index ? ' selected' : ''}`}>
                 <input
                   type="radio"
                   name="correctOption"
                   value={index}
                   checked={correctOptionIndex === index}
                   onChange={() => setCorrectOptionIndex(index)}
-                  className="option-radio"
                 />
-                <span className="option-number">Option {index + 1}</span>
+                Option {index + 1}{option.trim() ? `: ${option}` : ''}
               </label>
-              <input
-                type="text"
-                value={option}
-                onChange={(e) => {
-                  const newOptions = [...options];
-                  newOptions[index] = e.target.value;
-                  setOptions(newOptions);
-                }}
-                placeholder={`Enter option ${index + 1}`}
-                className="option-text-input"
-              />
-              {correctOptionIndex === index && (
-                <span className="correct-tick">&#10003; Correct</span>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="form-actions">
-          <button onClick={handleAddOrUpdateQuestion} className="btn-primary">
-            {editingQuestion ? 'Update Question' : 'Add Question'}
-          </button>
-          {editingQuestion && (
-            <button onClick={resetForm} className="btn-secondary">Cancel</button>
+            ))}
+          </div>
+          {correctOptionIndex !== null && (
+            <p className="correct-option-preview">
+              Correct answer set to: <strong>Option {correctOptionIndex + 1}</strong>
+              {options[correctOptionIndex].trim() ? ` — "${options[correctOptionIndex]}"` : ' (option text not entered yet)'}
+            </p>
           )}
         </div>
+
+        <button onClick={handleAddOrUpdateQuestion}>
+          {editingQuestion ? 'Update Question' : 'Add Question'}
+        </button>
+        {editingQuestion && (
+          <button onClick={resetForm}>Cancel</button>
+        )}
       </div>
 
-      {/* Questions List */}
+      {/* Question List */}
       {questions.length > 0 && (
-        <div className="questions-list-section">
+        <div className="question-list">
           <h3>Questions in this Quiz</h3>
-          <table className="questions-table">
+          <table>
             <thead>
               <tr>
-                <th>#</th>
                 <th>Question</th>
                 <th>Options</th>
-                <th>Correct Answer</th>
-                <th>Actions</th>
+                <th>Correct Option</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {questions.map((question, qIdx) => (
-                <tr key={question._id}>
-                  <td>{qIdx + 1}</td>
-                  <td className="question-cell">{question.questionText}</td>
-                  <td>
-                    <ol className="options-list">
-                      {question.options.map((opt, i) => (
-                        <li
-                          key={i}
-                          className={opt === question.correctAnswer ? 'correct-option-item' : ''}
-                        >
-                          {opt}{opt === question.correctAnswer ? ' ✓' : ''}
-                        </li>
+              {questions.map((question) => {
+                const correctIdx = question.options.findIndex(
+                  (opt) => opt === question.correctAnswer
+                );
+                return (
+                  <tr key={question._id}>
+                    <td>{question.questionText}</td>
+                    <td>
+                      {question.options.map((option, index) => (
+                        <div key={index}>
+                          <strong>Option {index + 1}:</strong> {option}
+                        </div>
                       ))}
-                    </ol>
-                  </td>
-                  <td className="correct-answer-cell">
-                    {question.options.indexOf(question.correctAnswer) >= 0
-                      ? `Option ${question.options.indexOf(question.correctAnswer) + 1}`
-                      : question.correctAnswer}
-                  </td>
-                  <td className="actions-cell">
-                    <FaEdit
-                      className="icon-edit"
-                      onClick={() => handleEditQuestion(question)}
-                    />
-                    <FaTrash
-                      className="icon-delete"
-                      onClick={async () => {
-                        if (!window.confirm('Delete this question?')) return;
-                        try {
-                          await axiosInstance.delete(`/api/delete-question/${question._id}`);
-                          alert('Question deleted successfully');
-                          fetchQuestions();
-                        } catch (error) {
-                          console.error('Error deleting question:', error);
-                          alert('Error deleting question');
-                        }
-                      }}
-                    />
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="correct-option-cell">
+                      {correctIdx >= 0
+                        ? `Option ${correctIdx + 1}: ${question.correctAnswer}`
+                        : question.correctAnswer || 'N/A'}
+                    </td>
+                    <td>
+                      <div className="action-buttons">
+                        <FaEdit
+                          className="icon-edit"
+                          onClick={() => handleEditQuestion(question)}
+                        />
+                        <FaTrash
+                          className="icon-delete"
+                          onClick={async () => {
+                            if (!window.confirm('Delete this question?')) return;
+                            try {
+                              await axiosInstance.delete(`/api/delete-question/${question._id}`);
+                              alert('Question deleted successfully');
+                              fetchQuestions();
+                            } catch (error) {
+                              console.error('Error deleting question:', error);
+                              alert('Error deleting question');
+                            }
+                          }}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
