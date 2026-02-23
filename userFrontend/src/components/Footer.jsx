@@ -1,7 +1,6 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
 import '../styles/componentstyle/footer.css';
-import { FaFacebook, FaLinkedin, FaTelegram } from 'react-icons/fa';
+import { FaLinkedin } from 'react-icons/fa';
 
 export default function Footer() {
   return (
@@ -12,28 +11,12 @@ export default function Footer() {
         </div>
         <div className="footer-social">
           <a
-            href="https://www.facebook.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="social-icon"
-          >
-            <FaFacebook />
-          </a>
-          <a
-            href="https://www.linkedin.com"
+            href="https://www.linkedin.com/in/rahul-gupta-077526277/"
             target="_blank"
             rel="noopener noreferrer"
             className="social-icon"
           >
             <FaLinkedin />
-          </a>
-          <a
-            href="https://t.me"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="social-icon"
-          >
-            <FaTelegram />
           </a>
         </div>
       </div>
